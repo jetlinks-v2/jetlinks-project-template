@@ -133,6 +133,11 @@
 
     <dependencies>
 
+        <!--
+        认证、权限管理模块
+        //源代码
+        git submodule add git@github.com/jetlinks-v2/authentication-manager.git jetlinks-manager/authentication-manager
+        -->
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>authentication-manager</artifactId>
