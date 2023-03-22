@@ -8,9 +8,10 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>project-template-archetype</name>
+    <name>JetLinks Project Template</name>
     <modules>
         <module>bootstrap</module>
+        <module>modules/crud-examples</module>
     </modules>
 
     <properties>
@@ -122,8 +123,8 @@
         </repository>
 
         <repository>
-            <id>hsweb-nexus</id>
-            <name>Nexus Release Repository</name>
+            <id>jetlinks</id>
+            <name>JetLinks Maven Repository</name>
             <url>https://nexus.hsweb.me/content/groups/jetlinks/</url>
             <snapshots>
                 <enabled>true</enabled>
