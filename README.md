@@ -34,6 +34,20 @@ git remote add origin {项目远程仓库地址}
 mvn clean compile
 ```
 
+### 配置maven密码
+
+修改maven的`settings.xml`,添加:
+```xml
+<servers>
+    <server>
+        <id>jetlinks</id>
+        <username>{用户名}</username>
+        <password>{密码}</password>
+    </server>
+</servers>
+
+```
+
 ## 开发
 
 项目开发建议使用maven模块化管理,在`modules`目录创建相应的业务模块,然后在`bootstrap`模块中引入依赖进行启动.
