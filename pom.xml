@@ -120,6 +120,9 @@
             <id>aliyun-nexus</id>
             <name>aliyun</name>
             <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
 
         <repository>
