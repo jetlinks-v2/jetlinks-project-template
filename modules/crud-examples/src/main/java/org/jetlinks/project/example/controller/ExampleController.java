@@ -1,17 +1,16 @@
 package org.jetlinks.project.example.controller;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType;
-import org.hswebframework.ezorm.rdb.mapping.annotation.EnumCodec;
 import org.hswebframework.web.api.crud.entity.PagerResult;
 import org.hswebframework.web.api.crud.entity.QueryParamEntity;
 import org.hswebframework.web.authorization.annotation.Resource;
 import org.hswebframework.web.crud.query.QueryHelper;
-import org.hswebframework.web.crud.web.reactive.ReactiveServiceCrudController;
+import org.jetlinks.pro.assets.annotation.AssetsController;
+import org.jetlinks.pro.assets.crud.AssetsHolderCrudController;
+import org.jetlinks.project.example.asset.ExampleAssetType;
 import org.jetlinks.project.example.entity.ExampleEntity;
 import org.jetlinks.project.example.entity.ExtendedEntity;
 import org.jetlinks.project.example.enums.ExampleEnum;
@@ -21,16 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import javax.persistence.Column;
-import java.sql.JDBCType;
-
 @RestController
 @RequestMapping("/example/crud")
 @AllArgsConstructor
 @Getter
 @Resource(id = "example", name = "增删改查演示")//资源定义,用于权限控制
 @Tag(name = "增删改查演示") //swagger
-public class ExampleController implements ReactiveServiceCrudController<ExampleEntity, String> {
+@AssetsController(type = ExampleAssetType.TYPE_ID)
+public class ExampleController implements AssetsHolderCrudController<ExampleEntity, String> {
 
     private final ExampleService service;
 
@@ -44,6 +41,7 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
             .all(ExtendedEntity.class, ExampleInfo::setExt)
             .from(ExampleEntity.class)
             .leftJoin(ExtendedEntity.class, spec -> spec.is(ExtendedEntity::getId, ExampleEntity::getId))
+            //根据前端的动态条件参数自动构造查询条件以及分页排序等信息
             .where(query)
             .fetchPaged();
     }
@@ -54,11 +52,9 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
             .select("select t.*,ext.* from example_crud t" +
                         " left join example_crud_ext ext on ext.example_id = t.id",
                     ExampleInfo::new)
+            //根据前端的动态条件参数自动构造查询条件以及分页排序等信息
             .where(query)
-            .fetchPaged()
-            .doOnNext(c->{
-                System.out.println(c);
-            });
+            .fetchPaged();
     }
 
 

@@ -25,7 +25,7 @@ class ExampleControllerTest extends TestJetLinksController {
     void testCrud() {
 
         client
-            .post()
+            .patch()
             .uri("/example/crud")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{\"name\": \"test\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\",\"enum3\"]}")
@@ -50,7 +50,7 @@ class ExampleControllerTest extends TestJetLinksController {
     @Test
     void testJoin() {
         client
-            .post()
+            .patch()
             .uri("/example/crud")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{\"name\": \"joinTest\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\"]}")

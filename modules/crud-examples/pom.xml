@@ -10,6 +10,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <!--
+     如果启动后此模块未生效,请在Idea右上角Maven选项卡中的Profiles中钩上develop.
+     或者在打包时加上 -P develop,如: mvn package -P develop -DskipTests
+     -->
     <artifactId>crud-examples</artifactId>
 
     <dependencies>
@@ -22,6 +26,23 @@
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>test-component</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>assets-component</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>gateway-component</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>configure-component</artifactId>
         </dependency>
 
     </dependencies>

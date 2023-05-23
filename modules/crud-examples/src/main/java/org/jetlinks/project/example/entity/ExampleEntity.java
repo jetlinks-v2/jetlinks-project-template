@@ -26,7 +26,9 @@ import java.util.Map;
 @Setter
 @Schema(description = "增删改查演示")
 @EnableEntityEvent //开启实体类crud事件
-public class ExampleEntity extends GenericEntity<String> implements RecordCreationEntity, RecordModifierEntity {
+public class ExampleEntity extends GenericEntity<String>
+    //实现这2个接口标记此实体类需要记录创建人修改人信息，在crud时会自动填充对应的信息。
+    implements RecordCreationEntity, RecordModifierEntity {
 
     @Column(length = 64, nullable = false)
     @NotBlank(groups = CreateGroup.class)
@@ -37,6 +39,7 @@ public class ExampleEntity extends GenericEntity<String> implements RecordCreati
     @Schema(description = "说明")
     private String description;
 
+    //平台ID长度统一64,创建人不为空,不可修改
     @Column(length = 64, nullable = false, updatable = false)
     @Schema(description = "创建人ID", accessMode = Schema.AccessMode.READ_ONLY)
     private String creatorId;
@@ -62,12 +65,14 @@ public class ExampleEntity extends GenericEntity<String> implements RecordCreati
     private ExampleEnum singleEnum;
 
     @Column
+    //使用枚举掩码来存储多选值,因此数据库中用bigint来存储
     @EnumCodec(toMask = true)
     @ColumnType(javaType = Long.class, jdbcType = JDBCType.BIGINT)
     @Schema(description = "多选")
     private ExampleEnum[] multiEnum;
 
     @Column
+    //使用json字符串来存储map,因此数据库中使用LONGVARCHAR来存储
     @JsonCodec
     @ColumnType(javaType = String.class, jdbcType = JDBCType.LONGVARCHAR)
     @Schema(description = "其他信息")
