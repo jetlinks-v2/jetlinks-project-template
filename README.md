@@ -4,9 +4,13 @@
 
 ```bash
 ---jetlinks-project-template
-        |--bootstrap 项目启动模块
+        |--bootstrap 单体项目启动模块
+        |--micro-services 微服务相关模块
+        |-----|----api-gateway-service API网关服务
         |--modules 子模块
-        |-----|----crud-examples 增删改查示例
+        |-----|----examples  示例相关模块
+        |-----|-------|-----crud-examples 增删改查示例
+        |-----|-------|-----rule-engine-example 自定义规则引擎节点示例
 ```
 
 ## 使用
