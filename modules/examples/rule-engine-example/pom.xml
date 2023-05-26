@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jetlinks.project</groupId>
+        <artifactId>jetlinks-project-template</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../../pom.xml</relativePath>
+    </parent>
+
+    <!--
+     如果启动后此模块未生效,请在Idea右上角Maven选项卡中的Profiles中钩上develop.
+     或者在打包时加上 -P develop,如: mvn package -P develop -DskipTests
+     -->
+    <artifactId>rule-engine-example</artifactId>
+
+    <dependencies>
+
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>rule-engine-component</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

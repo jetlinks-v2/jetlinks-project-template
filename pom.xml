@@ -9,10 +9,6 @@
     <packaging>pom</packaging>
 
     <name>JetLinks Project Template</name>
-    <modules>
-        <module>bootstrap</module>
-        <module>modules/crud-examples</module>
-    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -100,6 +96,36 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+
+        <!-- 单体项目运行时请设置 -P standalone -->
+        <profile>
+            <id>standalone</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>bootstrap</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>develop</id>
+            <modules>
+                <module>modules/examples/crud-examples</module>
+                <module>modules/examples/rule-engine-example</module>
+            </modules>
+        </profile>
+
+        <!-- 微服务项目运行时请设置 -P microservice -->
+        <profile>
+            <id>microservice</id>
+            <modules>
+                <module>micro-services/api-gateway-service</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>

@@ -66,6 +66,12 @@
                     <artifactId>crud-examples</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.project</groupId>
+                    <artifactId>rule-engine-example</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
@@ -138,6 +144,26 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>authentication-manager</artifactId>
+        </dependency>
+
+        <!--
+        规则引擎模块
+        //源代码
+        git submodule add git@github.com/jetlinks-v2/rule-engine-manager.git jetlinks-manager/rule-engine-manager
+        -->
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>rule-engine-manager</artifactId>
+        </dependency>
+
+        <!--
+        消息通知模块
+        //源代码
+        git submodule add git@github.com/jetlinks-v2/notify-manager.git jetlinks-manager/notify-manager
+        -->
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>notify-manager</artifactId>
         </dependency>
 
         <dependency>

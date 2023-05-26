@@ -18,7 +18,7 @@
 
 ### gitee
 
-新建仓库时选择使用模版仓库L `jetlinks-project-template`
+新建仓库时选择使用模版仓库 `jetlinks-project-template`
 
 ### 本地创建
 

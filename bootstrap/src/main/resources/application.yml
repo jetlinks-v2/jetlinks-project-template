@@ -117,18 +117,6 @@ jetlinks:
     system:
       context:
         server: ${jetlinks.server-id}
-  protocol:
-    spi:
-      enabled: false # 为true时开启自动加载通过依赖引入的协议包
-  device:
-    registry:
-      auto-discover: enabled  #当无法从注册中心获取设备时,尝试从数据库中获取,并自动注册到注册中心.
-    storage:
-      default-policy: default-row # 默认设备数据存储策略
-      enable-last-data-in-db: false # 是否将设备最新到数据存储到数据库
-#      log:
-#        excludes: # 这些日志不存储
-#          - REPORT_PROPERTY
 rule:
   engine:
     server-id: ${jetlinks.server-id}
@@ -151,7 +139,7 @@ logging:
     org.jetlinks.pro.elastic.search.service: warn
     org.jetlinks.pro.elastic.search.service.reactive: warn
     org.jetlinks.pro.network: warn
-    org.jetlinks.demo: warn
+    org.jetlinks.pro.cluster: warn
     io.vertx.mqtt.impl: warn
     org.jetlinks.supports.device.session: warn
     org.elasticsearch.deprecation: off
@@ -195,6 +183,9 @@ sso:
   base-url: http://localhost:9000/api
 trace:
   enabled: true
+  jaeger: # 收集追踪信息到jaeger
+    enabled: false
+    endpoint: "http://127.0.0.1:14250"
 system:
   config:
     scopes:
@@ -234,8 +225,3 @@ file:
   manager:
     storage-base-path: "./data/files"
     read-buffer-size: 64KB
-network:
-  resources:
-    - 1883-1890
-    - 8800-8810
-    - 5060-5061
