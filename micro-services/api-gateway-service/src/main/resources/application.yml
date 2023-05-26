@@ -1,0 +1,99 @@
+server:
+  port: 8800
+  max-http-header-size: 100KB
+  error:
+    include-message: always
+  url: http://127.0.0.1:${server.port}
+spring:
+  application:
+    name: api-gateway-service
+  profiles:
+    active: dev,local
+  cloud:
+    gateway:
+      routes:
+        # 文件服务
+        - id: file-service
+          uri: lb://file-service
+          predicates:
+            - Path=/file/**
+          filters:
+            - Authentication
+        # 静态文件不需要授权就可以访问,因此不设置Authentication filter
+        - id: file-service-no-auth
+          uri: lb://file-service
+          predicates:
+            - Path=/upload/**
+        # 访问认证服务相关接口文档
+        - id: auth-service-doc
+          uri: lb://authentication-service
+          predicates:
+            - Path=/v3/api-docs/系统管理相关接口
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          filters:
+            - RewritePath='/' + serviceId + '/(?<remaining>.*)','/${remaining}'
+            - Authentication
+    discovery:
+      enabled: true
+    loadbalancer:
+      ribbon:
+        enabled: false
+      configurations: context-zone
+      zone: ${local.ip}
+  reactor:
+    debug-agent:
+      enabled: false
+  codec:
+    max-in-memory-size: 50MB
+logging:
+  level:
+    org.jetlinks: warn
+    org.jetlinks.supports: warn
+    org.jetlinks.pro: warn
+springdoc:
+  swagger-ui:
+    urls:
+      - url: ${server.url}/v3/api-docs/系统管理相关接口
+        name: 系统管理相关接口
+jetlinks:
+  server-id: ${spring.application.name}:${server.port}
+  cluster:
+    id: ${jetlinks.server-id}
+    name: ${spring.application.name}
+    port: 1${server.port} # 集群通信通信本地端口
+    external-host: 127.0.0.1  #集群节点通信对外暴露的host
+    external-port: ${jetlinks.cluster.port} #集群节点通信对外暴露的端口
+    rpc-port: 2${server.port} # 集群节点本地RPC端口
+    rpc-external-host: ${jetlinks.cluster.external-host}  #集群节点RPC对外暴露host
+    rpc-external-port: 2${server.port} #集群节点RPC对外暴露端口
+  #    rpc-token: jetlinks # 集群节点RPC通信token,生产环境请修改
+  #    seeds:  #集群种子节点,集群时,配置为集群节点的 external-host:external-port
+  #      - 127.0.0.1:18100
+  microservice:
+    discovery:
+      enabled: true # 开启平台内置的服务发现,其他服务需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+      register-self: false # 不注册自己到服务发现
+    gateway:
+      route:
+        auto-discovery:
+          enabled: true # 开启路由自动发现,自动获取微服务的路由信息进行代理
+
+#链路追踪
+trace:
+  enabled: true #全局开启链路追踪,对性能有一定影响.
+  jaeger: # 收集链路信息到jaeger
+    enabled: false
+    endpoint: "http://127.0.0.1:14250"
+#  ignore-spans:
+#    - "忽略的span名称"
+# 跨域配置
+cors:
+  enable: true
+  allowed-headers: "*"
+  allowed-methods: [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ]
+  allowed-origins: [ "*" ]
+  #        allow-credentials: false
+  max-age: 1800
