@@ -72,6 +72,12 @@
                     <artifactId>rule-engine-example</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.project</groupId>
+                    <artifactId>tracing-example</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

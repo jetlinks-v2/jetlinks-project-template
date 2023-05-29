@@ -123,6 +123,7 @@
             <modules>
                 <module>modules/examples/crud-examples</module>
                 <module>modules/examples/rule-engine-example</module>
+                <module>modules/examples/tracing-example</module>
             </modules>
         </profile>
 
