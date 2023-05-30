@@ -132,6 +132,7 @@
             <id>microservice</id>
             <modules>
                 <module>micro-services/api-gateway-service</module>
+                <module>micro-services/authentication-service</module>
             </modules>
         </profile>
     </profiles>

@@ -19,6 +19,11 @@ spring:
             - Path=/file/**
           filters:
             - Authentication
+        # 授权认证服务
+        - id: authentication-service
+          uri: lb://authentication-service
+          predicates:
+            - Path=/authorize/**,/user/**,/token/**,/asset/types,/assets/access-support/*
         # 静态文件不需要授权就可以访问,因此不设置Authentication filter
         - id: file-service-no-auth
           uri: lb://file-service
