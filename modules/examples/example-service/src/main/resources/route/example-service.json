@@ -1,0 +1,6 @@
+[
+  {
+    "path": "/messaging/**",
+    "authorize": true
+  }
+]

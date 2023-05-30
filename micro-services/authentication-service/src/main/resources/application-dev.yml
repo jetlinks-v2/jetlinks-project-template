@@ -6,6 +6,15 @@ spring:
       zone: ${local.ip}
       cache:
         enabled: false
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/jetlinks
+    username: postgres
+    password: jetlinks
+    pool:
+      max-size: 32
+easyorm:
+  default-schema: public # 数据库默认的schema
+  dialect: postgres #数据库方言
 logging:
   level:
     org.jetlinks: debug

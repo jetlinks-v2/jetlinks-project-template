@@ -124,6 +124,7 @@
                 <module>modules/examples/crud-examples</module>
                 <module>modules/examples/rule-engine-example</module>
                 <module>modules/examples/tracing-example</module>
+                <module>modules/examples/example-service</module>
             </modules>
         </profile>
 
