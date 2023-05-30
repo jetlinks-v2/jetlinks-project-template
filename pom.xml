@@ -133,6 +133,7 @@
             <modules>
                 <module>micro-services/api-gateway-service</module>
                 <module>micro-services/authentication-service</module>
+                <module>micro-services/file-service</module>
             </modules>
         </profile>
     </profiles>
