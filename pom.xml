@@ -125,6 +125,7 @@
                 <module>modules/examples/rule-engine-example</module>
                 <module>modules/examples/tracing-example</module>
                 <module>modules/examples/example-service</module>
+                <module>modules/examples/rpc-example</module>
             </modules>
         </profile>
 
