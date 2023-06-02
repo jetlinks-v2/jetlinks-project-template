@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
+//node-red 可视化规则编排设计器需要的资源文件
 @EditorResource(
     id = "example",
     name = "Example",
@@ -62,6 +63,7 @@ public class ExampleTaskExecutorProvider implements TaskExecutorProvider {
             );
         }
 
+        //上游节点输入时此方法将会被调用并返回新的数据给下游节点
         @Override
         protected Publisher<RuleData> apply(RuleData input) {
             //执行后返回数据给下游节点
