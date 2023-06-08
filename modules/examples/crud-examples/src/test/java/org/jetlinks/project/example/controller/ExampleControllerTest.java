@@ -53,7 +53,16 @@ class ExampleControllerTest extends TestJetLinksController {
             .patch()
             .uri("/example/crud")
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("{\"name\": \"joinTest\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\"]}")
+            .bodyValue("{\"id\": \"1\",\"name\": \"joinTest\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\"]}")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
+
+        client
+            .patch()
+            .uri("/example/crud/_ext")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"exampleId\": \"1\",\"extName\": \"1\"}")
             .exchange()
             .expectStatus()
             .is2xxSuccessful();
@@ -66,6 +75,7 @@ class ExampleControllerTest extends TestJetLinksController {
                     .queryParam("where", "name is joinTest")
                     .build())
                 .exchange()
+                .expectStatus().is2xxSuccessful()
                 .expectBody(String.class)
                 .returnResult()
                 .getResponseBody();
@@ -81,6 +91,39 @@ class ExampleControllerTest extends TestJetLinksController {
                     .queryParam("where", "name is joinTest")
                     .build())
                 .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult()
+                .getResponseBody();
+            assertNotNull(result);
+            System.out.println(JSON.toJSONString(JSON.parse(result), SerializerFeature.PrettyFormat));
+        }
+
+        {
+            String result = client
+                .get()
+                .uri(builder -> builder
+                    .path("/example/crud/_detail_logic/_query")
+                    .queryParam("where", "name is joinTest")
+                    .build())
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult()
+                .getResponseBody();
+            assertNotNull(result);
+            System.out.println(JSON.toJSONString(JSON.parse(result), SerializerFeature.PrettyFormat));
+        }
+
+        {
+            String result = client
+                .get()
+                .uri(builder -> builder
+                    .path("/example/crud/_detail_many/_query")
+                    .queryParam("where", "name is joinTest")
+                    .build())
+                .exchange()
+                .expectStatus().is2xxSuccessful()
                 .expectBody(String.class)
                 .returnResult()
                 .getResponseBody();
