@@ -61,7 +61,7 @@ logging:
 springdoc:
   swagger-ui:
     urls:
-      - url: ${server.url}/v3/api-docs/系统管理相关接口
+      - url: /api/v3/api-docs/系统管理相关接口
         name: 系统管理相关接口
 jetlinks:
   server-id: ${spring.application.name}:${server.port}

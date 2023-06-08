@@ -165,6 +165,13 @@ micrometer:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    url: /api/v3/api-docs
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: 系统管理相关接口
+        url: /api/v3/api-docs/系统管理相关接口
+  api-docs:
+    path: /v3/api-docs
   #  packages-to-scan: org.jetlinks
   group-configs:
     - group: 系统管理相关接口
