@@ -64,6 +64,7 @@ public class ExampleController implements AssetsHolderCrudController<ExampleEnti
         return queryHelper
             .select(ExampleInfo.class)
             .all(ExampleEntity.class)
+            //属性类型为list自动处理为OneToMany
             .all(ExtendedEntity.class, ExampleInfo::setExtList)
             .from(ExampleEntity.class)
             .leftJoin(ExtendedEntity.class, spec -> spec.is(ExtendedEntity::getExampleId, ExampleEntity::getId))
@@ -78,15 +79,23 @@ public class ExampleController implements AssetsHolderCrudController<ExampleEnti
     @GetMapping("/_detail_logic/_query")
     public Mono<PagerResult<ExampleInfo>> joinLogicExample(QueryParamEntity query) {
         return QueryHelper
-            .transformPageResult(service.queryPager(query),
-                                 list -> QueryHelper
-                                     .combineOneToMany(Flux.fromIterable(list).map(e -> e.copyTo(new ExampleInfo())),
-                                                       ExampleInfo::getId,
-                                                       extRepository.createQuery(),
-                                                       ExtendedEntity::getExampleId,
-                                                       ExampleInfo::setExtList
-                                     )
-                                     .collectList());
+            .transformPageResult(
+                //分页查询原始数据
+                service.queryPager(query),
+                list -> QueryHelper
+                    .combineOneToMany(
+                        //原始数据转为 ExampleInfo
+                        Flux.fromIterable(list).map(e -> e.copyTo(new ExampleInfo())),
+                        //主表数据ID
+                        ExampleInfo::getId,
+                        //查询关联表
+                        extRepository.createQuery(),
+                        //关联表中的主表ID属性
+                        ExtendedEntity::getExampleId,
+                        //关联数据设置到主表中
+                        ExampleInfo::setExtList
+                    )
+                    .collectList());
     }
 
     @GetMapping("/_detail/_query_native")
