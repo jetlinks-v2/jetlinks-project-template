@@ -149,6 +149,7 @@ logging:
     org.jetlinks.pro.influx: trace
     org.elasticsearch.deprecation.search.aggregations.bucket.histogram: off
     org.jetlinks.supports.scalecube: warn
+    org.jetlinks.project: debug
   config: classpath:logback-spring.xml
   logback:
     rollingpolicy:

@@ -26,7 +26,7 @@ public class ExampleEventHandler {
 
     private final EventBus eventBus;
 
-    static final String TOPIC_CREATED = "/example/created";
+    public static final String TOPIC_CREATED = "/example/saved";
 
     @EventListener
     public void handleEvent(EntitySavedEvent<ExampleEntity> event) {
