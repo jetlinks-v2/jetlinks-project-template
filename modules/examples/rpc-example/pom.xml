@@ -11,8 +11,8 @@
     </parent>
 
     <!--
-     如果启动后此模块未生效,请在Idea右上角Maven选项卡中的Profiles中钩上develop.
-     或者在打包时加上 -P develop,如: mvn package -P develop -DskipTests
+     如果启动后此模块未生效,请在Idea右上角Maven选项卡中的Profiles中钩上example.
+     或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>rpc-example</artifactId>
 
