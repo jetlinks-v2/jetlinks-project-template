@@ -1,5 +1,6 @@
 package org.jetlinks.project.example.controller;
 
+import io.netty.buffer.ByteBufAllocator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,16 +12,32 @@ import org.hswebframework.web.authorization.annotation.Resource;
 import org.hswebframework.web.crud.query.QueryHelper;
 import org.jetlinks.pro.assets.annotation.AssetsController;
 import org.jetlinks.pro.assets.crud.AssetsHolderCrudController;
+import org.jetlinks.pro.io.excel.ExcelUtils;
+import org.jetlinks.pro.io.excel.ImportHelper;
+import org.jetlinks.pro.io.file.FileInfo;
+import org.jetlinks.pro.io.file.FileManager;
+import org.jetlinks.pro.io.file.FileOption;
+import org.jetlinks.pro.io.utils.FileUtils;
 import org.jetlinks.project.example.asset.ExampleAssetType;
 import org.jetlinks.project.example.entity.ExampleEntity;
 import org.jetlinks.project.example.entity.ExtendedEntity;
 import org.jetlinks.project.example.enums.ExampleEnum;
 import org.jetlinks.project.example.service.ExampleService;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.NettyDataBuffer;
+import org.springframework.core.io.buffer.NettyDataBufferFactory;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/example/crud")
@@ -35,6 +52,8 @@ public class ExampleController implements AssetsHolderCrudController<ExampleEnti
     private final ReactiveRepository<ExtendedEntity, String> extRepository;
 
     private final QueryHelper queryHelper;
+
+    private final FileManager fileManager;
 
     @PatchMapping("/_ext")
     public Mono<Void> addExtended(@RequestBody Flux<ExtendedEntity> extendedEntityFlux) {
@@ -107,6 +126,57 @@ public class ExampleController implements AssetsHolderCrudController<ExampleEnti
             //根据前端的动态条件参数自动构造查询条件以及分页排序等信息
             .where(query)
             .fetchPaged();
+    }
+
+
+    //根据上传的文件来导入数据并将导入结果保存到文件中返回结果文件地址
+    @PostMapping("/_import.{format}")
+    public Mono<String> importByFileUpload(@PathVariable String format,
+                                           @RequestPart("file") Mono<FilePart> file) {
+
+
+        return FileUtils
+            .dataBufferToInputStream(file.flatMapMany(FilePart::content))
+            .flatMap(inputstream -> new ImportHelper<>(
+                ExampleEntity::new,
+                //数据处理逻辑
+                flux -> service.save(flux).then())
+                //批量处理数量
+                .bufferSize(200)
+                //当批量处理失败时,是否回退到单条数据处理
+                .fallbackSingle(true)
+                .doImport(inputstream,
+                          format,
+                          info -> null,
+                          //将导入的结果保存为临时文件
+                          result -> fileManager
+                              .saveFile("import." + format, result, FileOption.tempFile)
+                              .map(FileInfo::getAccessUrl))
+                .last()
+            );
+    }
+
+    //导出数据
+    @GetMapping("/_export/{name}.{format}")
+    public Mono<Void> export(QueryParamEntity param,
+                             @PathVariable String name,
+                             //文件格式: 支持csv,xlsx
+                             @PathVariable String format,
+                             ServerWebExchange exchange) {
+
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        //文件名
+        exchange.getResponse().getHeaders().setContentDisposition(
+            ContentDisposition
+                .attachment()
+                .filename(name + "." + format, StandardCharsets.UTF_8)
+                .build()
+        );
+        return exchange
+            .getResponse()
+            .writeWith(
+                ExcelUtils.write(ExampleEntity.class, service.query(param.noPaging()), format)
+            );
     }
 
 

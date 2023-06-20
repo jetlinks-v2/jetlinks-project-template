@@ -12,7 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.List;
 
@@ -72,7 +75,7 @@ class ExampleControllerTest extends TestJetLinksController {
                 .get()
                 .uri(builder -> builder
                     .path("/example/crud/_detail/_query")
-                    .queryParam("where", "name is joinTest")
+                    .queryParam("where", "name is joinTest and extName is 1")
                     .build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -132,4 +135,48 @@ class ExampleControllerTest extends TestJetLinksController {
         }
     }
 
+    @Test
+    void testExport() {
+        client
+            .patch()
+            .uri("/example/crud")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("[{\"name\": \"test-e\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\",\"enum3\"]}," +
+                           "{\"name\": \"test-e-2\",\"singleEnum\": \"enum1\",\"multiEnum\": [\"enum1\",\"enum3\"]}]")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
+
+
+        String body = client
+            .get()
+            .uri(builder -> builder
+                .path("/example/crud/_export/test.csv")
+                .queryParam("where", "name like test-e%")
+                .build())
+            .exchange()
+            .expectStatus().is2xxSuccessful()
+            .expectBody(String.class)
+            .returnResult()
+            .getResponseBody();
+
+        System.out.println(body);
+    }
+
+    @Test
+    void testImport() {
+        String body = client
+            .post()
+            .uri(builder -> builder
+                .path("/example/crud/_import.csv")
+                .build())
+            .body(BodyInserters.fromMultipartData("file", new HttpEntity<>(new ClassPathResource("test.csv"))))
+            .exchange()
+            .expectStatus().is2xxSuccessful()
+            .expectBody(String.class)
+            .returnResult()
+            .getResponseBody();
+
+        System.out.println(body);
+    }
 }

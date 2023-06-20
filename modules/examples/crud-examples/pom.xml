@@ -24,6 +24,11 @@
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
+            <artifactId>io-component</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
             <artifactId>test-component</artifactId>
             <scope>test</scope>
         </dependency>
