@@ -150,6 +150,7 @@
                 <module>modules/examples/example-service</module>
                 <module>modules/examples/rpc-example</module>
                 <module>modules/examples/websocket-example</module>
+                <module>modules/examples/expand-property-example</module>
             </modules>
         </profile>
 
