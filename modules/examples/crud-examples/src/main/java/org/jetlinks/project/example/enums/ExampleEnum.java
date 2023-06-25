@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hswebframework.web.dict.I18nEnumDict;
 
+// 通过接口GET dictionary/example-enum/items可获取选项内容
 @AllArgsConstructor
 @Getter
 public enum ExampleEnum implements I18nEnumDict<String> {
