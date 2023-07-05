@@ -44,6 +44,6 @@ public class ExampleTimers implements CommandLineRunner {
         disposable =
             FluxCluster
                 //不同的任务名不能相同
-                .schedule("example-test", Duration.ofSeconds(30), this.delete(Duration.ofDays(1)));
+                .schedule("example-test", Duration.ofSeconds(30), Mono.defer(() -> this.delete(Duration.ofDays(1))));
     }
 }
