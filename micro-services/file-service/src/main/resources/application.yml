@@ -47,6 +47,11 @@ hsweb:
       enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
       excludes: # 这下包下的接口不包装
         - org.springdoc
+  cache:
+    type: redis
+    redis:
+      local-cache-type: caffeine
+
 easyorm:
   default-schema: public
   dialect: postgres
