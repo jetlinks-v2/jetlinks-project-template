@@ -192,7 +192,7 @@
         <repository>
             <id>jetlinks</id>
             <name>JetLinks Maven Repository</name>
-            <url>https://nexus.hsweb.me/content/groups/jetlinks/</url>
+            <url>https://nexus.jetlinks.cn/content/groups/jetlinks/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
