@@ -14,9 +14,9 @@
      如果启动后此模块未生效,请在Idea右上角Maven选项卡中的Profiles中钩上example.
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
-    <artifactId>crud-examples</artifactId>
+    <artifactId>thirdparty-iam-example</artifactId>
 
-    <name>增删改查示例</name>
+    <name>使用第三方认证系统示例</name>
 
     <dependencies>
         <dependency>

@@ -12,6 +12,7 @@
 
     <artifactId>example-service</artifactId>
 
+    <name>微服务示例</name>
 
     <build>
         <finalName>application</finalName>

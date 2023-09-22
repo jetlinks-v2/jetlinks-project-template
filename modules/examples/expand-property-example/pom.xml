@@ -15,6 +15,7 @@
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>expand-property-example</artifactId>
+    <name>拓展系统已有实体字段示例</name>
 
     <dependencies>
 

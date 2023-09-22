@@ -15,6 +15,7 @@
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>rpc-example</artifactId>
+    <name>集群RPC调用示例</name>
 
     <dependencies>
 

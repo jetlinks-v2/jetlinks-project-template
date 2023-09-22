@@ -15,6 +15,7 @@
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>tracing-example</artifactId>
+    <name>链路追踪示例</name>
 
     <dependencies>
 

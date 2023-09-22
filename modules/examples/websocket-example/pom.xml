@@ -15,6 +15,7 @@
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>websocket-example</artifactId>
+    <name>websocket示例</name>
 
     <dependencies>
 

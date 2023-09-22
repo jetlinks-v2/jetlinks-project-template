@@ -15,6 +15,7 @@
      或者在打包时加上 -P example,如: mvn package -P example -DskipTests
      -->
     <artifactId>rule-engine-example</artifactId>
+    <name>自定义规则引擎示例</name>
 
     <dependencies>
 
