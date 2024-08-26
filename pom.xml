@@ -15,7 +15,7 @@
         <project.build.locales>zh_CN</project.build.locales>
         <java.version>1.8</java.version>
         <project.build.jdk>${java.version}</project.build.jdk>
-        <jetlinks.pro.version>2.2.0-SNAPSHOT</jetlinks.pro.version>
+        <jetlinks.pro.version>2.3.0-SNAPSHOT</jetlinks.pro.version>
         <spring.boot.version>2.7.18</spring.boot.version>
     </properties>
 
