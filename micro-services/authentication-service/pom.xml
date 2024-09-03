@@ -48,6 +48,13 @@
         </plugins>
     </build>
     <dependencies>
+
+        <!-- 基础模块依赖 -->
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>common-component</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-dependencies</artifactId>
