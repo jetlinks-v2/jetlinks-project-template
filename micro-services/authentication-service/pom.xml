@@ -55,6 +55,12 @@
             <artifactId>common-component</artifactId>
         </dependency>
 
+        <!-- 默认使用es存储时序相关数据，如: 日志,统计等 -->
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>elasticsearch-component</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-dependencies</artifactId>

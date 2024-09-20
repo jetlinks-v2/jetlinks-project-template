@@ -159,6 +159,12 @@
             <artifactId>common-component</artifactId>
         </dependency>
 
+        <!-- 默认使用es存储时序相关数据，如: 日志,统计等 -->
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>elasticsearch-component</artifactId>
+        </dependency>
+
         <!--
         认证、权限管理模块
         //源代码
