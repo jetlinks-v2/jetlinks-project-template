@@ -6,12 +6,15 @@
 </body>
 </html>
 <script type="text/javascript">
+    let path = window.location.pathname;
+
+    let basePath = path.substring(0, path.indexOf("/token-set.html"));
 
     var error = getQueryVariable("error");
     if ("true" === error) {
         var message = getQueryVariable("message") || "未知错误";
 
-        window.location.href = "/#/user/login?message="+message;
+        window.location.href = basePath + "#/user/login?message="+message;
     }
 
     var token = getQueryVariable("token");
@@ -21,7 +24,7 @@
         if (direct) {
             window.location.href = decodeURIComponent(direct);
         } else {
-            window.location.href = "/";
+            window.location.href = basePath;
         }
     }
 
