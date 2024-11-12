@@ -54,6 +54,20 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>common-component</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-commons-crud</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-redis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
