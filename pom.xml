@@ -152,6 +152,7 @@
                 <module>modules/examples/websocket-example</module>
                 <module>modules/examples/expand-property-example</module>
                 <module>modules/examples/thirdparty-iam-example</module>
+                <module>modules/examples/command-examples</module>
             </modules>
         </profile>
 
