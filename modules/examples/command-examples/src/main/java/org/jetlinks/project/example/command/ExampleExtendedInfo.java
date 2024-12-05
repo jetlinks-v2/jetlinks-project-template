@@ -21,10 +21,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ExampleExtendedInfo {
 
-    @Schema(title = "id")
+    @Schema(title = "演示数据id")
     private String id;
 
-    @Schema(title = "名称")
+    @Schema(title = "演示数据名称")
     private String name;
 
     @Schema(title = "拓展信息")

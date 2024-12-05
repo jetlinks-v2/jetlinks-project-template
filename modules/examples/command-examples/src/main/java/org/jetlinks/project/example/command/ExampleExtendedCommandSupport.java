@@ -24,7 +24,7 @@ import java.util.function.Function;
  */
 @Component
 @AllArgsConstructor
-@CommandService(id = "exampleService:extended", name = "示例拓展服务", description = "填写对应描述")
+@CommandService(id = "exampleService:extended", name = "示例拓展服务", description = "示例拓展相关操作")
 public class ExampleExtendedCommandSupport {
 
     private final ReactiveRepository<ExampleEntity, String> exampleRepository;
@@ -67,17 +67,17 @@ public class ExampleExtendedCommandSupport {
     //自定义命令
     @CommandHandler
     public Flux<ExampleExtendedInfo> queryExampleInfo(QueryExampleInfoCommand command) {
-        QueryExampleInfoCommand.InputSpec inputSpec = command.getInputSpec();
+        Integer extendedSize = command.getOrNull("extendedSize", Integer.class);
         return queryHelper
             .select(ExampleExtendedInfo.class)
             .all(ExampleEntity.class)
             .all(ExtendedEntity.class, ExampleExtendedInfo::setExtList)
             .from(ExampleEntity.class)
             .leftJoin(ExtendedEntity.class, spec -> spec.is(ExtendedEntity::getExampleId, ExampleEntity::getId))
-            .where(inputSpec.toQueryParam())
+            .where(command.asQueryParam())
             .fetch()
-            .filter(info -> info.getExtList() != null
-                && inputSpec.getExtendedSize() == info.getExtList().size());
+            .filter(info -> extendedSize != null
+                && extendedSize == info.getExtList().size());
     }
 
 

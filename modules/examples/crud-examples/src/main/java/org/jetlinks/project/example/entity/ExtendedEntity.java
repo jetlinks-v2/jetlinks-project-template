@@ -20,10 +20,12 @@ import javax.persistence.Table;
 @AllArgsConstructor
 public class ExtendedEntity extends GenericEntity<String> {
 
+    @Schema(title = "演示数据id")
     @Column(length = 64, nullable = false,updatable = false)
     private String exampleId;
 
     @Column
+    @Schema(title = "拓展名称")
     private String extName;
 
 
