@@ -32,3 +32,4 @@ docker/data
 /dist/data/
 .run
 application-local.yml
+.DS_Store
