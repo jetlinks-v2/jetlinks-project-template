@@ -1,8 +1,8 @@
 server:
   port: 8300
-  max-http-header-size: 200KB
   error:
     include-message: always
+  max-http-request-header-size: 200KB
 spring:
   profiles:
     active: dev,local
@@ -22,20 +22,18 @@ spring:
   reactor:
     debug-agent:
       enabled: true # 开启调试代理,在打印异常时将会生成调用踪栈信息
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    lettuce:
-      pool:
-        max-active: 1024
-    timeout: 20s
-    password: iot@cloud
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/jetlinks
     username: postgres
     password: jetlinks
     pool:
       max-size: 32
+  data:
+    redis:
+      port: 6379
+      host: 127.0.0.1
+      timeout: 20s
+      password: iot@cloud
 hsweb:
   file:
     upload:
@@ -97,3 +95,8 @@ file:
   manager:
     storage-base-path: ./data/files
     read-buffer-size: 64KB
+management:
+  simple:
+    metrics:
+      export:
+        enabled: false

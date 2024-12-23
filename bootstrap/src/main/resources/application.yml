@@ -1,8 +1,8 @@
 server:
   port: 8080
-  max-http-header-size: 64KB
   error:
     include-message: always
+  max-http-request-header-size: 64KB
 spring:
   profiles:
     active: dev
@@ -18,10 +18,6 @@ spring:
     resources:
       static-locations: file:./static,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/, classpath:/public/
   redis:
-    host: 127.0.0.1
-    port: 6379
-    database: 0
-    timeout: 60s
     serializer: obj # 设置obj时,redis key使用string序列化,value使用SerializeUtils进行序列化.
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/jetlinks
@@ -43,8 +39,12 @@ spring:
     uris: localhost:9200
     socket-timeout: 10s
     connection-timeout: 15s
-    webclient:
-      max-in-memory-size: 100MB
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 60s
 #    username:
 #    password:
 easyorm:
@@ -225,9 +225,9 @@ system:
             name: 高德地图ApiKey # 名称
 #            default-value: "请输入高德地图的apikey" # 默认值
 management:
-  metrics:
-    export:
-      simple:
+  simple:
+    metrics:
+      export:
         enabled: false
 file:
   manager:

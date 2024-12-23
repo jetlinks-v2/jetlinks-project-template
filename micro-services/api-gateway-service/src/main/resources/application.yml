@@ -1,9 +1,9 @@
 server:
   port: 8800
-  max-http-header-size: 100KB
   error:
     include-message: always
   url: http://127.0.0.1:${server.port}
+  max-http-request-header-size: 100KB
 spring:
   application:
     name: api-gateway-service

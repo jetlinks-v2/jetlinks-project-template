@@ -25,6 +25,11 @@
             <artifactId>rule-engine-component</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>rule-engine-manager</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -1,8 +1,8 @@
 server:
   port: 8100
-  max-http-header-size: 200KB
   error:
     include-message: always
+  max-http-request-header-size: 200KB
 spring:
   profiles:
     active: dev,local
@@ -19,14 +19,7 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: true
     default-property-inclusion: non_null
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    lettuce:
-      pool:
-        max-active: 1024
-    timeout: 20s
-#    password: ""
+  #    password: ""
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/jetlinks
     username: postgres
@@ -42,8 +35,11 @@ spring:
     uris: localhost:9200
     socket-timeout: 10s
     connection-timeout: 15s
-    webclient:
-      max-in-memory-size: 100MB
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      timeout: 20s
 #  rsocket:
 #    server:
 #      port: 8101
@@ -185,3 +181,8 @@ trace:
 captcha:
   enabled: true
   ttl: 5m
+management:
+  simple:
+    metrics:
+      export:
+        enabled: false

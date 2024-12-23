@@ -1,6 +1,7 @@
 package org.jetlinks.project.example.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType;
@@ -19,7 +20,6 @@ import org.jetlinks.project.example.enums.ExampleEnum;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
 import java.sql.JDBCType;
 import java.util.Map;
 
