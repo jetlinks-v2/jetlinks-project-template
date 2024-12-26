@@ -63,6 +63,12 @@
             <dependencies>
                 <dependency>
                     <groupId>org.jetlinks.project</groupId>
+                    <artifactId>command-examples</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.project</groupId>
                     <artifactId>crud-examples</artifactId>
                     <version>${project.version}</version>
                 </dependency>
