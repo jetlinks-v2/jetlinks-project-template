@@ -1,0 +1,67 @@
+services:
+  ui:
+    image: registry.cn-shenzhen.aliyuncs.com/jetlinks/jetlinks-template-ui:1.0
+    container_name: template-ui
+    ports:
+      - "9100:9100"
+    volumes:
+      # 只挂载 modules 目录
+      - ./ui:/app/src/modules
+    environment:
+      - VITE_PORT=9100
+      - NODE_ENV=${NODE_ENV:-development}
+      # 后端地址
+      - VITE_APP_DEV_PROXY_URL=http://host.docker.internal:8080
+  redis:
+    image: redis:5.0.4
+    container_name: template-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data/redis:/data"
+    command: redis-server --appendonly yes
+#    command: redis-server --appendonly yes --requirepass "JetLinks@redis"
+    environment:
+      - TZ=Asia/Shanghai
+  postgres:
+    image: postgres:11-alpine
+    container_name: template-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./data/postgres:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_PASSWORD: jetlinks
+      POSTGRES_DB: jetlinks
+      TZ: Asia/Shanghai
+  elasticsearch:
+#    image: elasticsearch:7.17.5
+    #arm版本
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    container_name: template-elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Xms1g -Xmx1g"
+      TZ: Asia/Shanghai
+      transport.host: 0.0.0.0
+      discovery.type: single-node
+      bootstrap.memory_lock: "true"
+      discovery.zen.minimum_master_nodes: 1
+      discovery.zen.ping.unicast.hosts: elasticsearch
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  kibana:
+#    image: kibana:6.8.10
+    #arm版本
+    image: docker.elastic.co/kibana/kibana:7.13.4-arm64
+    container_name: jetlinks-kibana
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    links:
+      - elasticsearch:elasticsearch
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
