@@ -92,6 +92,17 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>ui</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>jetlinks-ui-resource</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
     <build>
