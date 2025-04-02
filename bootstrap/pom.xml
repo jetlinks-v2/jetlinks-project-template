@@ -92,17 +92,6 @@
                 </dependency>
             </dependencies>
         </profile>
-
-        <profile>
-            <id>ui</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jetlinks.pro</groupId>
-                    <artifactId>jetlinks-ui-resource</artifactId>
-                    <version>${jetlinks.pro.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 
     <build>
@@ -164,6 +153,13 @@
     </build>
 
     <dependencies>
+        <!-- ui基础依赖 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>jetlinks-ui-resource</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+             
         <!-- 基础模块依赖 -->
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
