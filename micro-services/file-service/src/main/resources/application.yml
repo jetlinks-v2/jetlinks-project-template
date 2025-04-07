@@ -95,7 +95,16 @@ file:
   manager:
     storage-base-path: ./data/files
     read-buffer-size: 64KB
+    stateless:
+        enabled: true
 management:
+  health:
+    elasticsearch:
+      enabled: false
+  elastic:
+    metrics:
+      export:
+        enabled: false
   simple:
     metrics:
       export:

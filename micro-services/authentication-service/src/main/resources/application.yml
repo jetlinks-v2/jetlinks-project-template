@@ -182,6 +182,13 @@ captcha:
   enabled: true
   ttl: 5m
 management:
+  health:
+    elasticsearch:
+      enabled: false
+  elastic:
+    metrics:
+      export:
+        enabled: false
   simple:
     metrics:
       export:

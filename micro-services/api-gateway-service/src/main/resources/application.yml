@@ -102,3 +102,15 @@ cors:
   allowed-origins: [ "*" ]
   #        allow-credentials: false
   max-age: 1800
+management:
+  health:
+    elasticsearch:
+      enabled: false
+  elastic:
+    metrics:
+      export:
+        enabled: false
+  simple:
+    metrics:
+      export:
+        enabled: false
