@@ -162,7 +162,7 @@
         <!-- 默认使用es存储时序相关数据，如: 日志,统计等 -->
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
-            <artifactId>elasticsearch-component</artifactId>
+            <artifactId>elasticsearch-7x</artifactId>
         </dependency>
 
         <!--
@@ -261,15 +261,9 @@
             <artifactId>r2dbc-h2</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
 
         <dependency>
@@ -286,17 +280,6 @@
             <groupId>de.ruedigermoeller</groupId>
             <artifactId>fst</artifactId>
             <version>2.57</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-springdoc-ui</artifactId>
-            <version>3.0.3</version>
         </dependency>
 
         <dependency>
