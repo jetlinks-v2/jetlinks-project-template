@@ -1,0 +1,83 @@
+server:
+    port: 8800
+    error:
+        include-message: always
+    url: http://127.0.0.1:9000/api
+    max-http-request-header-size: 100KB
+spring:
+    application:
+        name: api-gateway-service
+    profiles:
+        active: default,dev,local
+    cloud:
+        gateway:
+            forwarded:
+                enabled: true
+            globalcors:
+                cors-configurations:
+                    '[/**]':
+                        allowedOrigins:
+                            - "*" # 生产环境建议配置已知的域名
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - OPTIONS
+                            - DELETE
+                        allowedHeaders:
+                            - "*"
+                #              allowCredentials: true
+            discovery:
+                locator:
+                    enabled: true
+                    lower-case-service-id: true
+                    filters:
+                        - RewritePath='/' + serviceId + '/(?<remaining>.*)','/${remaining}'
+                        - Authentication
+        discovery:
+            enabled: true
+        loadbalancer:
+            ribbon:
+                enabled: false
+            configurations: context-zone
+            zone: ${local.ip}
+    reactor:
+        debug-agent:
+            enabled: false
+    codec:
+        max-in-memory-size: 50MB
+logging:
+    level:
+        org.jetlinks: debug
+        org.jetlinks.supports: warn
+        "org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker": error
+        "org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplierBuilder": error
+        "io.rsocket": warn
+        "io.scalecube": warn
+jetlinks:
+    server-id: ${spring.application.name}:${server.port}
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        #    rpc-token: jetlinks # 集群节点RPC通信token,生产环境请修改
+        event-namespace: api # 时间总线命名空间,api网关不需要订阅集群事件.
+        namespace: default,api
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,其他服务需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+            register-self: true
+springdoc:
+    security:
+        enabled: false # api gateway 不处理swagger,由ui-service处理.
+trace:
+    enabled: true
+    service-name: ${spring.application.name}:${server.port}

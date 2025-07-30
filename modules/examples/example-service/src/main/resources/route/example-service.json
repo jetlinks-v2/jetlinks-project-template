@@ -1,6 +1,0 @@
-[
-  {
-    "path": "/messaging/**",
-    "authorize": true
-  }
-]

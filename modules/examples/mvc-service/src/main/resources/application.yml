@@ -1,0 +1,147 @@
+server:
+    port: 8900
+    error:
+        include-message: always
+    max-http-request-header-size: 32MB
+spring:
+    threads:
+      virtual:
+          enabled: false # java 21 开启虚拟线程
+    profiles:
+        active: default,dev,local
+    application:
+        name: mvc-service
+    datasource:
+        database-type: postgresql
+        url: jdbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:5432}/${DB_DATABASE:jetlinks}?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true
+        username: ${DB_USERNAME:postgres}
+        password: ${DB_PASSWORD:jetlinks}
+        hikari:
+            maximum-pool-size: 256
+            max-lifetime: 600000 # 600s
+            connection-timeout: 30000 # 30s
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: Asia/Shanghai
+        serialization:
+            WRITE_DATES_AS_TIMESTAMPS: true
+        default-property-inclusion: non_null
+        deserialization:
+          accept-single-value-as-array: true
+    web:
+        resources:
+            static-locations: file:./static,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/, classpath:/public/
+    codec:
+        max-in-memory-size: 50MB
+    reactor:
+        debug-agent:
+            enabled: true # 开启调试代理,在打印异常时将会生成调用踪栈信息
+    elasticsearch:
+        uris: ${ES_URIS:localhost:9200} # ES集群地址,多个地址用逗号分隔
+        socket-timeout: 10s
+        connection-timeout: 15s
+        username: ${ES_USERNAME:""}
+        password: ${ES_PASSWORD:""}
+    data:
+        redis:
+            host: ${REDIS_HOST:127.0.0.1}
+            port: ${REDIS_PORT:6379}
+            timeout: 20s
+            password: ${REDIS_PASSWORD:iot@cloud}
+            database: ${REDIS_DATABASE:0}
+#      lettuce:
+#        pool:
+#          enabled: true
+hsweb:
+    webflux:
+        response-wrapper:
+            enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
+            excludes: # 这下包下的接口不包装
+                - org.springdoc
+    authorize:
+        auto-parse: true
+    cache:
+        type: redis
+        redis:
+            local-cache-type: caffeine
+easyorm:
+    default-schema: ${DB_SCHEMA:public} # 数据库默认的schema
+    dialect: postgres #数据库方言
+jetlinks:
+    server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        namespace: default,example
+        eventbus-includes:
+            iot-service: # 以下topic,只从iot-service节点订阅.
+                - /device/**
+                - /*/*/device/**
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+        token:
+            jwt:
+                #用于解码jwt的公钥
+                decode-key: ${JWT_PUBLIC_KEY}
+logging:
+    level:
+        org.jetlinks: info
+        rule.engine: info
+        org.hswebframework: info
+        org.springframework.transaction: info
+        org.springframework.data.r2dbc.connectionfactory: info
+        io.micrometer: warn
+        org.hswebframework.expands: error
+        system: info
+        org.jetlinks.rule.engine: info
+        org.jetlinks.gateway: info
+        org.springframework: warn
+        org.apache.kafka: warn
+        org.jetlinks.pro.device.message.writer: info
+        org.jetlinks.supports: warn
+        org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker: error
+        "org.elasticsearch.client.RestClient": error
+        "org.jetlinks.pro.buffer": warn
+        "org.hswebframework.web.starter.i18n": warn
+        "org.jetlinks.pro.tracing.LocalTracingService": warn
+        "org.jetlinks.pro.things.data.LocalFileThingsDataManager": warn
+        "io.rsocket": warn
+        "io.scalecube": warn
+        root: info
+    #    org.elasticsearch: error
+    logback:
+        rollingpolicy:
+            max-file-size: 100MB
+            max-history: 7
+            total-size-cap: 10GB
+    file:
+        name: ./data/logs/${spring.application.name}_${server.port}.log
+        path: ./data/logs
+    threshold:
+        file: INFO # 文件只记录INFO以上的日志
+        console: TRACE
+        event: WARN
+    config: classpath:logback-spring.xml
+management:
+    health:
+        elasticsearch:
+            enabled: false
+    elastic:
+        metrics:
+            export:
+                enabled: false
+file:
+    manager:
+        database:
+            enabled: false # 文件信息不存储到数据库
+        stateless:
+            enabled: true # 文件信息存储到磁盘

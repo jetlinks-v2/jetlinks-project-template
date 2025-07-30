@@ -4,12 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.jetlinks.project</groupId>
+        <groupId>org.jetlinks.pro</groupId>
         <artifactId>jetlinks-project-template</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>2.11.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bootstrap</artifactId>
+
+    <name>单体方式启动</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,31 +64,31 @@
             <id>example</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.jetlinks.project</groupId>
+                    <groupId>org.jetlinks.pro</groupId>
                     <artifactId>crud-examples</artifactId>
                     <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
-                    <groupId>org.jetlinks.project</groupId>
+                    <groupId>org.jetlinks.pro</groupId>
                     <artifactId>rule-engine-example</artifactId>
                     <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
-                    <groupId>org.jetlinks.project</groupId>
+                    <groupId>org.jetlinks.pro</groupId>
                     <artifactId>tracing-example</artifactId>
                     <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
-                    <groupId>org.jetlinks.project</groupId>
+                    <groupId>org.jetlinks.pro</groupId>
                     <artifactId>websocket-example</artifactId>
                     <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
-                    <groupId>org.jetlinks.project</groupId>
+                    <groupId>org.jetlinks.pro</groupId>
                     <artifactId>expand-property-example</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -119,7 +121,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.jetlinks.project.Application</mainClass>
+                    <mainClass>org.jetlinks.pro.Application</mainClass>
                     <layout>ZIP</layout>
                     <layers>
                         <enabled>true</enabled>
@@ -137,16 +139,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
-                <executions>
-                    <execution>
-                        <id>report-aggregate</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>

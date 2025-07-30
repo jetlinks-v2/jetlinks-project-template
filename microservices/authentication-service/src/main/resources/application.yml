@@ -1,0 +1,256 @@
+server:
+    port: 8100
+    error:
+        include-message: always
+    max-http-request-header-size: 200KB
+spring:
+    profiles:
+        active: default,dev,local
+    application:
+        name: authentication-service
+    cloud:
+        loadbalancer:
+            ribbon:
+                enabled: false
+            zone: ${local.ip}
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: Asia/Shanghai
+        serialization:
+            WRITE_DATES_AS_TIMESTAMPS: true
+        default-property-inclusion: non_null
+    r2dbc:
+        url: r2dbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:5432}/${DB_DATABASE:jetlinks}
+        username: ${DB_USERNAME:postgres}
+        password: ${DB_PASSWORD:jetlinks}
+        pool:
+            max-size: 128
+            max-idle-time: 60s
+            max-life-time: 1m
+            max-acquire-time: 10s
+        #    properties:
+        #      preparedStatementCacheQueries: 100
+    codec:
+        max-in-memory-size: 100MB
+    reactor:
+        debug-agent:
+            enabled: false # 开启调试代理,在打印异常时将会生成调用踪栈信息
+    elasticsearch:
+        uris: ${ES_URIS:localhost:9200} # ES集群地址,多个地址用逗号分隔
+        socket-timeout: 10s
+        connection-timeout: 15s
+        username: ${ES_USERNAME:""}
+        password: ${ES_PASSWORD:""}
+    data:
+        redis:
+            host: ${REDIS_HOST:127.0.0.1}
+            port: ${REDIS_PORT:6379}
+            timeout: 20s
+            password: ${REDIS_PASSWORD:iot@cloud}
+            database: ${REDIS_DATABASE:0}
+easyorm:
+    default-schema: ${DB_SCHEMA:public} # 数据库默认的schema
+    dialect: postgres #数据库方言
+elasticsearch:
+    index:
+        default-strategy: time-by-month #默认es的索引按月进行分表
+        settings:
+            number-of-shards: 1 # es 分片数量
+            number-of-replicas: 0 # 副本数量
+hsweb:
+    cors:
+        enable: true
+        configs:
+            -   path: /**
+                allowed-headers: "*"
+                allowed-methods: [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ]
+                allowed-origins: [ "*" ]
+                #        allow-credentials: true
+                max-age: 1800
+    dict:
+        enum-packages: org.jetlinks
+    webflux:
+        response-wrapper:
+            enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
+            excludes: # 这下包下的接口不包装
+                - org.springdoc
+    authorize:
+        auto-parse: true
+    #  user-token:
+    #    allopatric-login-mode: offlineOther  ## 设置异地登录模式为 将其他地方登录的相同用户踢下线
+    #    allopatric-login-modes:
+    #      app: offlineOther
+    permission:
+        filter:
+            enabled: true # 设置为true开启权限过滤,赋权时,不能赋予比自己多的权限.
+            exclude-username: admin # admin用户不受上述限制
+            un-auth-strategy: ignore # error表示:发生越权时,抛出403错误. ignore表示会忽略越权的赋权.
+    cache:
+        type: redis
+        redis:
+            local-cache-type: guava
+jetlinks:
+    server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        config-storage-namespace: auth
+        namespace: default,auth
+        eventbus-includes:
+            iot-service: # 集群时只从iot-service节点订阅.
+                - /device/**
+                - /*/*/device/**
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+            instance:
+                host: ${jetlinks.cluster.external-host}
+        token:
+            jwt:
+                #用于编码jwt的私钥,禁止泄漏,生产环境请更换此KEY,可使用test下的RsaGenerator生成.
+                encode-key: ${JWT_PRIMARY_KEY}
+                #用于解码jwt的公钥
+                decode-key: ${JWT_PUBLIC_KEY}
+    logging:
+        system:
+            context:
+                server: ${spring.application.name}
+    authentication:
+        defaults:
+            user:
+                admin:
+                    - "*:*"
+    user-init:
+        enabled: true
+        users:
+            -   id: 1199596756811550720
+                username: admin
+                name: 超级管理员
+                type: admin
+                password: ${ADMIN_USER_PASSWORD:HT@@sv2Pd0}
+                status: 1
+    application:
+        enabled: true
+        id: ${spring.application.name}
+        name: ${spring.application.name}
+        description: "为接入平台的应用提供专业的身份认证和授权服务"
+rule:
+    engine:
+        server-id: ${jetlinks.server-id}
+        server-name: ${spring.application.name}
+        executor-filter:
+            enabled: true
+            includes: # 不启用任何规则节点调度
+                - "none"
+logging:
+    level:
+        org.jetlinks: info
+        rule.engine: info
+        org.hswebframework: info
+        org.springframework.transaction: info
+        org.springframework.data.r2dbc.connectionfactory: info
+        io.micrometer: warn
+        org.hswebframework.expands: error
+        system: info
+        org.jetlinks.rule.engine: info
+        org.jetlinks.gateway: info
+        org.springframework: warn
+        org.apache.kafka: warn
+        org.jetlinks.pro.device.message.writer: info
+        org.jetlinks.supports: warn
+        org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker: error
+        "org.elasticsearch.client.RestClient": error
+        "org.jetlinks.pro.buffer": warn
+        "org.hswebframework.web.starter.i18n": warn
+        "org.jetlinks.pro.tracing.LocalTracingService": warn
+        "org.jetlinks.pro.things.data.LocalFileThingsDataManager": warn
+        "io.rsocket": warn
+        "io.scalecube": warn
+        root: info
+    logback:
+        rollingpolicy:
+            max-file-size: 100MB
+            max-history: 7
+            total-size-cap: 10GB
+    file:
+        name: ./data/logs/${spring.application.name}_${server.port}.log
+        path: ./data/logs
+    threshold:
+        file: INFO # 文件只记录INFO以上的日志
+        console: TRACE
+        event: WARN
+    config: classpath:logback-spring.xml
+springdoc:
+    #  packages-to-scan: org.jetlinks
+    group-configs:
+        -   group: authentication-service
+            display-name: "认证服务"
+            packages-to-scan:
+                - org.jetlinks.pro.auth
+                - org.hswebframework.web.system.authorization.defaults.webflux
+                - org.hswebframework.web.file
+                - org.hswebframework.web.authorization.basic.web
+                - org.jetlinks.pro.openapi.manager.web
+    cache:
+        disabled: false
+    security:
+        enabled: true
+system:
+    config:
+        scopes:
+            -   id: front  #兼容旧配置
+                name: 前端配置
+                public-access: true
+            -   id: authentication-service-front
+                name: 前端配置
+                public-access: true
+            -   id: paths
+                name: 访问路径配置
+                public-access: true
+                properties:
+                    -   key: base-path
+                        name: 接口根路径
+                        default-value: http://localhost:9000/api
+                    -   key: sso-redirect
+                        name: sso认证成功默认回调路径
+                        default-value: http://localhost:9000
+                    -   key: sso-bind
+                        name: sso用户绑定路径
+                        default-value: http://localhost:9000/#/account/center/bind
+                    -   key: sso-token-set
+                        name: ssoToken设置路径
+                        default-value: http://localhost:9000/api/token-set.html
+            -   id: amap
+                name: 高德地图配置
+                public-access: false
+                properties:
+                    -   key: apiKey # 配置id
+                        name: 高德地图ApiKey # 名称
+trace:
+    enabled: true
+    jaeger:
+        enabled: false
+        endpoint: "http://127.0.0.1:14250"
+captcha:
+    enabled: true
+    ttl: 5m
+management:
+    health:
+        elasticsearch:
+            enabled: false
+    elastic:
+        metrics:
+            export:
+                enabled: false
+    simple:
+        metrics:
+            export:
+                enabled: false

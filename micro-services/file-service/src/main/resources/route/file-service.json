@@ -1,7 +1,0 @@
-[
-  {
-    "path": "/file/**",
-    "authorize": true,
-    "order": -1
-  }
-]

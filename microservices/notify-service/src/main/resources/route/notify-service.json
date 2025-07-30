@@ -1,0 +1,22 @@
+[
+    {
+        "path": "/system/bulletin/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/notify/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/notifier/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/notifications/**",
+        "authorize": true,
+        "order": -1
+    }
+]

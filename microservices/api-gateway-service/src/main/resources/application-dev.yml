@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+      zone: ${local.ip}
+      cache:
+        enabled: true
+        ttl: 5s

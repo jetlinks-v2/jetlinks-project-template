@@ -1,0 +1,302 @@
+version: '3.8'
+
+# 定义通用环境变量
+x-common-variables: &common-variables
+  TZ: Asia/Shanghai
+  CLUSTER_SEEDS: api-gateway-service:18800
+  RPC_TOKEN: J@t1iNksR9~
+  spring.profiles.active: default,prod
+  JWT_PUBLIC_KEY: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==
+  logging.level.org.jetlinks.pro: warn
+  logging.level.org.hswebframework: warn
+# 定义数据库环境变量
+x-database-variables: &database-variables
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_DATABASE: jetlinks
+  DB_USERNAME: postgres
+  DB_PASSWORD: JetLinks@postgres
+  DB_SCHEMA: public
+
+# 定义Redis环境变量
+x-redis-variables: &redis-variables
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: JetLinks@redis
+  REDIS_DATABASE: 0
+
+# 定义Elasticsearch环境变量
+x-elasticsearch-variables: &elasticsearch-variables
+  ES_URIS: elasticsearch:9200
+  ES_USERNAME: ""
+  ES_PASSWORD: ""
+
+# 定义curl健康检查配置
+x-curl-health-check: &curl-health-check
+  interval: 10s
+  timeout: 5s
+  retries: 30
+  start_period: 20s
+
+services:
+    redis:
+        image: redis:6
+        container_name: jetlinks-ent-redis
+        volumes:
+            - "./data/redis:/data"
+        command: redis-server --appendonly yes --requirepass "JetLinks@redis"
+        environment:
+            - TZ=Asia/Shanghai
+        healthcheck:
+            test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "-a", "JetLinks@redis", "ping"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 60s
+        restart: unless-stopped
+
+    postgres:
+        image: timescale/timescaledb:latest-pg16
+        container_name: jetlinks-ent-postgres
+        volumes:
+            - "./data/postgres:/var/lib/postgresql/data"
+        environment:
+            POSTGRES_PASSWORD: JetLinks@postgres
+            POSTGRES_DB: jetlinks
+            POSTGRES_HOST_AUTH_METHOD: trust
+            TZ: Asia/Shanghai
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "postgres"]
+            interval: 30s
+            timeout: 10s
+            retries: 8
+            start_period: 90s
+        restart: unless-stopped
+
+    elasticsearch:
+        image: elasticsearch:7.17.0
+        container_name: jetlinks-ent-elasticsearch
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - xpack.security.enabled=false
+            - TZ=Asia/Shanghai
+        volumes:
+            - "./data/elasticsearch:/usr/share/elasticsearch/data"
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:9200/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # API网关服务
+    api-gateway-service:
+        image: jetlinks-api-gateway-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-api-gateway-service
+        ports:
+            - "8800:8800"
+        environment:
+            <<: [*common-variables, *redis-variables]
+            JAVA_OPTS: -Xmx512M
+            CLUSTER_EXTERNAL_HOST: api-gateway-service
+        volumes:
+            - "./data/api-gateway-service:/application/data"
+        depends_on:
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:8800/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 文件服务
+    file-service:
+        image: jetlinks-file-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-file-service
+        #        ports:
+        #            - "8300:8300"
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: file-service
+            JAVA_OPTS: -Xmx512M
+        volumes:
+            - "./data/file-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:8300/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 认证服务 - 第二个启动
+    authentication-service:
+        image: jetlinks-authentication-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-authentication-service
+#        ports:
+#            - "8100:8100"
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: authentication-service
+            JWT_PRIMARY_KEY: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAi2vTFvhiPHPxUMt9BjzeUr55+jXuWGPKMVGRvGA0OP+bQdjaYeukYJvvNL3WQB/iUflUUoeb2EfWCkDT3WfpbQIDAQABAkALW8JB+zcsBaYbSivqKvtR2M+T+uDRtdxUuEVPO4DSdwfcLvQOO6jEpibM4WKUqrcshxAAPNy/dGC0hheHEi9hAiEApOzOhfKgcloq8ZaYsVqa3wlg2WYLVNM86+Ermdbc4zcCIQDYaZSPVXRJQVWDuYYP0QNBiUZUrR2GVU9WXOxzKUoyewIgbFsxbQv1omvfXw6kj5GJwxP0T6EdvMN0eT1dWhuy0I0CIQDVnZII0b8ROC5i8dQE9LmUDR6hIqhMGxVPGDZFjnIw1QIgSyHvCqseko4e4LboUUhWIN4iVlvgm4vyKEgrsD4ucdw=
+            ADMIN_USER_PASSWORD: ${ADMIN_USER_PASSWORD:-HT@@sv2Pd0}
+            JAVA_OPTS: -Xmx1G
+        volumes:
+            - "./data/authentication-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            api-gateway-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:8100/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 物联网服务 - 第三个启动
+    iot-service:
+        image: jetlinks-iot-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-iot-service
+        ports:
+#            - "8200:8200"
+            - "1883:1883"  # MQTT端口
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: iot-service
+            JAVA_OPTS: -Xmx4G
+        volumes:
+            - "./data/iot-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            api-gateway-service:
+                condition: service_healthy
+            authentication-service:
+                condition: service_healthy
+            file-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:8200/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 规则引擎服务 - 第四个启动
+    rule-engine-service:
+        image: jetlinks-rule-engine-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-rule-engine-service
+#        ports:
+#            - "7300:7300"
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: rule-engine-service
+            JAVA_OPTS: -Xmx2G
+        volumes:
+            - "./data/rule-engine-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            api-gateway-service:
+                condition: service_healthy
+            authentication-service:
+                condition: service_healthy
+            iot-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:7300/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 通知服务 - 其他服务
+    notify-service:
+        image: jetlinks-notify-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-notify-service
+#        ports:
+#            - "7200:7200"
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: notify-service
+            JAVA_OPTS: -Xmx1G
+        volumes:
+            - "./data/notify-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            authentication-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:7200/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # UI服务 - 其他服务
+    ui-service:
+        image: jetlinks-ui-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-ui-service
+#        ports:
+#            - "8500:8500"
+        environment:
+            <<: *common-variables
+            CLUSTER_EXTERNAL_HOST: ui-service
+            JAVA_OPTS: -Xmx512M
+        volumes:
+            - "./data/ui-service:/application/data"
+        depends_on:
+            api-gateway-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:8500/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+    # 可视化服务 - 其他服务
+    visualization-service:
+        image: jetlinks-visualization-service:${JETLINKS_VERSION:-2.11.0-SNAPSHOT}
+        container_name: jetlinks-visualization-service
+#        ports:
+#            - "7510:7510"
+        environment:
+            <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
+            CLUSTER_EXTERNAL_HOST: visualization-service
+            JAVA_OPTS: -Xmx1G
+        volumes:
+            - "./data/visualization-service:/application/data"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            api-gateway-service:
+                condition: service_healthy
+            authentication-service:
+                condition: service_healthy
+            iot-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "--connect-timeout", "5", "--max-time", "10", "http://localhost:7510/"]
+            <<: *curl-health-check
+        restart: unless-stopped
+
+networks:
+    default:
+        driver: bridge

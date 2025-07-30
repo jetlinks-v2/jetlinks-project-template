@@ -1,0 +1,22 @@
+[
+    {
+        "path": "/alarm/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/rule-engine/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/rule-editor/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/scene/**",
+        "authorize": true,
+        "order": -1
+    }
+]

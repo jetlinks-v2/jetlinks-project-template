@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>jetlinks-project-template</artifactId>
+        <groupId>org.jetlinks.pro</groupId>
+        <version>2.11.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>iot-service</artifactId>
+
+    <name>IoT 设备管理服务</name>
+    <build>
+        <finalName>application</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>org.jetlinks.pro.IotApplication</mainClass>
+                    <layout>ZIP</layout>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <profiles>
+
+        <profile>
+            <id>es7x</id>
+            <properties>
+                <elasticsearch.version>7.17.26</elasticsearch.version>
+            </properties>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>elasticsearch-7x</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>co.elastic.clients</groupId>
+                    <artifactId>elasticsearch-java</artifactId>
+                    <version>${elasticsearch.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.elasticsearch.client</groupId>
+                    <artifactId>elasticsearch-rest-client</artifactId>
+                    <version>${elasticsearch.version}</version>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>es8x</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>elasticsearch-8x</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>cassandra</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>cassandra-component</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>influxdb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>influxdb-component</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>clickhouse</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>clickhouse-component</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>jdbc</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>ojdbc8</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.google.protobuf</groupId>
+                            <artifactId>protobuf-java</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- 云边协同 云端管理模块  (选配) -->
+        <profile>
+            <id>edge</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>edge-master</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- 云边协同 云端视频模块  (选配) -->
+        <profile>
+            <id>edge-media</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>edge-media-master</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- 云端录像模块 (选配) -->
+        <profile>
+            <id>media-recorder</id>
+           <dependencies>
+               <dependency>
+                   <groupId>org.jetlinks.pro</groupId>
+                   <artifactId>media-recorder</artifactId>
+                   <version>${jetlinks.pro.version}</version>
+               </dependency>
+           </dependencies>
+        </profile>
+
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>common-component</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>microservice-dependencies</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>microservice-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>device-manager</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>network-manager</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>rule-engine-manager</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>protocol-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>gateway-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>rabbitmq-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>kafka-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>logging-manager</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>notify-manager</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>geo-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>notify-dingtalk</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>notify-wechat</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>notify-webhook</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.hswebframework.web</groupId>
+            <artifactId>hsweb-system-dictionary</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>application-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>datasource-manager</artifactId>
+            <version>${jetlinks.pro.version}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>things-manager</artifactId>-->
+<!--            <version>${jetlinks.pro.version}</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>media-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>timescaledb-component</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>starrocks-component</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>ai-openai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>jetlinks-supcon-isys</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.jetlinks.pro</groupId>-->
+<!--            <artifactId>xugu-r2dbc-driver</artifactId>-->
+<!--            <version>1.1.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
+    </dependencies>
+</project>

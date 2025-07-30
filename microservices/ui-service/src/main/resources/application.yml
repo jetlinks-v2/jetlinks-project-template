@@ -1,0 +1,87 @@
+server:
+    port: 8500
+    error:
+        include-message: always
+        whitelabel:
+            enabled: false
+    max-http-request-header-size: 200KB
+spring:
+    profiles:
+        active: default,dev,local
+    application:
+        name: ui-service
+    cloud:
+        loadbalancer:
+            ribbon:
+                enabled: false
+            zone: ${local.ip}
+logging:
+    level:
+        org.jetlinks: debug
+        org.jetlinks.supports: warn
+        "org.jetlinks.pro.tracing.LocalTracingService": warn
+        "org.jetlinks.pro.things.data.LocalFileThingsDataManager": warn
+    #    org.elasticsearch: error
+    logback:
+        rollingpolicy:
+            max-file-size: 100MB
+            max-history: 7
+            total-size-cap: 10GB
+    file:
+        name: ./data/logs/${spring.application.name}_${server.port}.log
+        path: ./data/logs
+    threshold:
+        file: INFO # 文件只记录INFO以上的日志
+        console: TRACE
+        event: WARN
+    config: classpath:logback-spring.xml
+jetlinks:
+    server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        event-namespace: ui
+        config-storage-namespace: ui
+        namespace: api,auth
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+        token:
+            jwt:
+                #用于编码jwt的私钥,禁止泄漏,生产环境请更换此KEY,可使用test下的RsaGenerator生成.
+                decode-key: ${JWT_PUBLIC_KEY}
+# api 文档相关信息,配置api文档分组,具体的文档路由到对应的服务中.
+# 请在对应服务中配置route/xxxx.json
+hsweb:
+    webflux:
+        response-wrapper:
+            enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
+            excludes: # 这下包下的接口不包装
+                - org.springdoc
+springdoc:
+    swagger-ui:
+        urls:
+            -   url: /v3/api-docs/iot-service
+                name: 设备管理相关接口
+            -   url: /v3/api-docs/authentication-service
+                name: 系统管理相关接口
+        use-root-path: false
+        enabled: true
+        disable-swagger-default-url: true
+    security:
+        enabled: true
+cors:
+    enabled: true
+    allowed-headers: "*"
+    allowed-methods: [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ]
+    allowed-origins: [ "*" ]
+    #        allow-credentials: false
+    max-age: 1800

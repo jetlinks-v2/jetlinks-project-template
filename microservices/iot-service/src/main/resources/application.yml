@@ -1,0 +1,279 @@
+server:
+    port: 8200
+    error:
+        include-message: always
+    max-http-request-header-size: 200KB
+spring:
+    profiles:
+        active: default,dev,local
+    application:
+        name: iot-service
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: Asia/Shanghai
+        serialization:
+            WRITE_DATES_AS_TIMESTAMPS: true
+        default-property-inclusion: non_null
+    web:
+        resources:
+            static-locations: file:./static,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/, classpath:/public/
+    r2dbc:
+        url: r2dbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:5432}/${DB_DATABASE:jetlinks}
+        username: ${DB_USERNAME:postgres}
+        password: ${DB_PASSWORD:jetlinks}
+        pool:
+            max-size: 128
+            max-idle-time: 60s
+            max-life-time: 1m
+            max-acquire-time: 10s
+        #    properties:
+        #      preparedStatementCacheQueries: 100
+    codec:
+        max-in-memory-size: 100MB
+    reactor:
+        debug-agent:
+            enabled: false # 开启调试代理,在打印异常时将会生成调用踪栈信息
+    elasticsearch:
+        uris: ${ES_URIS:localhost:9200} # ES集群地址,多个地址用逗号分隔
+        socket-timeout: 10s
+        connection-timeout: 15s
+        username: ${ES_USERNAME:""}
+        password: ${ES_PASSWORD:""}
+    data:
+        redis:
+            host: ${REDIS_HOST:127.0.0.1}
+            port: ${REDIS_PORT:6379}
+            timeout: 20s
+            password: ${REDIS_PASSWORD:iot@cloud}
+            database: ${REDIS_DATABASE:0}
+easyorm:
+    default-schema: ${DB_SCHEMA:public} # 数据库默认的schema
+    dialect: postgres #数据库方言
+elasticsearch:
+    index:
+        default-strategy: time-by-month #默认es的索引按月进行分表
+        settings:
+            number-of-shards: 1 # es 分片数量，通常对应es集群节点数量
+            number-of-replicas: 0 # 副本数量
+#      options:
+#        lifecycle.name: lifecycle_name # 在kibana中配置的生命周期
+tdengine:
+    enabled: true #开启tdengine
+    database: ${TD_DATABASE:jetlinks} #tdengine数据库名称
+    connector: restful # 2.0移除jdbc支持仅保留restful
+    restful:
+        endpoints: ${TD_ENDPOINTS:http://127.0.0.1:6041/}
+        username: ${TD_USERNAME:root}
+        password: ${TD_PASSWORD:taosdata}
+        max-in-memory-size: 100MB
+        socket-timeout: 5S
+        connection-timeout: 10S
+device:
+    session:
+        report:
+            scope: none
+            interval: 10m
+            bucket-interval: 1m
+        persistence:
+            session-load-timeout: 60s # 会话加载超时时间
+            session-check-delay: 10m # 延迟定时状态检查
+            session-check-interval: 30s # 定时检查设备状态间隔
+            sync-delay: 5m # 延迟集群间同步设备会话的心跳时间
+            sync-interval: 1m # 集群间同步设备会话的心跳时间间隔
+hsweb:
+    dict:
+        enum-packages: org.jetlinks
+    webflux:
+        response-wrapper:
+            enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
+            excludes: # 这下包下的接口不包装
+                - org.springdoc
+    authorize:
+        auto-parse: true
+    cache:
+        type: redis
+        redis:
+            local-cache-type: guava
+jetlinks:
+    server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        eventbus-includes:
+            iot-service: # 集群时只从iot-service节点订阅设备相关的数据
+                - /device/**
+                - /org/*/device/**
+                - /user/*/device/**
+        config-storage-namespace: iot
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+        token:
+            jwt:
+                #用于解码jwt的公钥
+                decode-key: ${JWT_PUBLIC_KEY}
+    logging:
+        system:
+            context:
+                server: ${spring.application.name}
+    protocol:
+        spi:
+            enabled: false # 为true时开启自动加载通过依赖引入的协议包
+    device:
+        storage:
+            default-policy: default-row # 默认设备数据存储策略
+            enable-last-data-in-db: false # 是否将设备最新到数据存储到数据库
+    #      log:
+    #        excludes: # 这些日志不存储
+    #          - REPORT_PROPERTY
+    things:
+        metadata:
+            preprocessor:
+                enabled: true # 开启物模型预处理
+        data:
+            namespace: iot
+            auto-updater:
+                tags: [ "device" ]
+                properties: [ "device" ]
+            store:
+                max-size-each-property: 8 # 本地缓存的设备属性数量,会影响内存和磁盘占用.
+    application:
+        enabled: true
+        id: ${spring.application.name}
+        name: ${spring.application.name}
+        description: "提供稳定灵活的物联网核心能力基础功能模块，助力企业快速搭建属于自己的物联网平台"
+rule:
+    engine:
+        server-id: ${jetlinks.server-id}
+        server-name: ${spring.application.name}
+        executor-filter:
+#            includes: # iot 服务只支持以下规则节点调度,避免过多的节点运行.
+#                - device-message-sender
+#                - device-info
+#                - http-request
+#                - http-listener
+#                - mqtt-client
+            enabled: true
+            excludes:
+                - notifier # 消息通知由通知服务执行
+                - timer # 定时任务由规则引擎服务统一执行
+logging:
+    level:
+        org.jetlinks: info
+        rule.engine: info
+        org.hswebframework: info
+        org.springframework.transaction: info
+        org.springframework.data.r2dbc.connectionfactory: info
+        io.micrometer: warn
+        org.hswebframework.expands: error
+        system: info
+        org.jetlinks.rule.engine: info
+        org.jetlinks.gateway: info
+        org.springframework: warn
+        org.apache.kafka: warn
+        org.jetlinks.pro.device.message.writer: info
+        org.jetlinks.supports: warn
+        org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker: error
+        "org.elasticsearch.client.RestClient": error
+        "org.jetlinks.pro.buffer": warn
+        "org.hswebframework.web.starter.i18n": warn
+        "org.jetlinks.pro.tracing.LocalTracingService": warn
+        "org.jetlinks.pro.things.data.LocalFileThingsDataManager": warn
+        "io.rsocket": warn
+        "io.scalecube": warn
+        root: info
+    logback:
+        rollingpolicy:
+            max-file-size: 100MB
+            max-history: 7
+            total-size-cap: 10GB
+    file:
+        name: ./data/logs/${spring.application.name}_${server.port}.log
+        path: ./data/logs
+    threshold:
+        file: INFO # 文件只记录INFO以上的日志
+        console: TRACE
+        event: WARN
+    config: classpath:logback-spring.xml
+springdoc:
+    group-configs:
+        -   group: 设备管理相关接口
+            packages-to-scan:
+                - org.jetlinks.pro.device
+                - org.jetlinks.pro.geo.web
+            paths-to-exclude:
+                - /device-instance/**
+                - /device-product/**
+                - /protocol/**
+    cache:
+        disabled: false
+vertx:
+    max-event-loop-execute-time-unit: seconds
+    max-event-loop-execute-time: 30
+    max-worker-execute-time-unit: seconds
+    max-worker-execute-time: 30
+    prefer-native-transport: true
+micrometer:
+    time-series:
+        tags:
+            server: ${jetlinks.server-id}
+        metrics:
+            default:
+                step: 30s
+        ignore:
+            - jetlinks-metrics #忽略内部监控信息
+
+messaging:
+    mqtt:
+        enabled: true
+        port: 11883
+        host: 0.0.0.0
+management:
+    health:
+        elasticsearch:
+            enabled: false
+    elastic:
+        metrics:
+            export:
+                enabled: false
+    simple:
+        metrics:
+            export:
+                enabled: false
+network:
+    resources:
+        - 1883-1890
+        - 8800-8810
+        - 5060-5061
+trace:
+    enabled: true
+    jaeger:
+        enabled: false
+        endpoint: "http://127.0.0.1:14250"
+    ignore-spans:
+        #    - "/device/*/upstream"
+        #    - "/device/*/decode"
+        - "/java/TimeSeriesMessageWriterConnector/writeDeviceMessageToTs"
+        - "/java/DeviceStatusMeasurementProvider/incrementOnline"
+        - "/java/DeviceMessageMeasurementProvider/incrementMessage"
+        - "/java/DeviceGeoDataWriter/handleDeviceGeoProperty"
+        - "/java/DefaultDeviceDataManager/upgradeDeviceFirstPropertyTime"
+
+# 限制边缘端可访问的命令
+agent:
+    command:
+        filter:
+            enabled: true
+            includes:
+                "[pluginService:driver]": [ "QueryPager","QueryList","QueryById" ]
+                "[deviceService:device]": [ "QueryPager","QueryList","QueryById" ]
+                "[deviceService:product]": [ "QueryPager","QueryList","QueryById" ]
+                "[deviceService:protocol]": [ "QuerySupportTransportProtocols","QueryTransportDetail","QueryPager","QueryList","QueryById" ]

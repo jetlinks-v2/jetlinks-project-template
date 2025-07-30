@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>jetlinks-project-template</artifactId>
+        <groupId>org.jetlinks.pro</groupId>
+        <version>2.11.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ui-service</artifactId>
+    <name>UI前端服务</name>
+    <build>
+        <finalName>application</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>org.jetlinks.pro.UiApplication</mainClass>
+                    <layout>ZIP</layout>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <jetlinks.ui.version>2.10.0-SNAPSHOT</jetlinks.ui.version>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>network-card</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.ui</groupId>
+                    <artifactId>network-card-manager</artifactId>
+                    <version>${jetlinks.ui.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>media</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.ui</groupId>
+                    <artifactId>jetlinks-media</artifactId>
+                    <version>${jetlinks.ui.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>dueros</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.ui</groupId>
+                    <artifactId>jetlinks-dueros</artifactId>
+                    <version>${jetlinks.ui.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>aliyun-bridge</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.ui</groupId>
+                    <artifactId>jetlinks-aliyun-bridge-gateway</artifactId>
+                    <version>${jetlinks.ui.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>edge</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>jetlinks-edge-ui-resource</artifactId>
+                    <version>${jetlinks.ui.version}</version>
+                    <classifier>default</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>common-component</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-commons-crud</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-redis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-ui</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+        <!-- 通用资源 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>jetlinks-ui-resource</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <!-- 数采 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>data-collector</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <!-- 数据源 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>datasource-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <!-- 设备管理 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>device-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <!-- 认证模块 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>authentication-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <!-- 视频模块 -->
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>jetlinks-media</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>notify-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>rule-engine-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.ui</groupId>
+            <artifactId>visualization-manager</artifactId>
+            <version>${jetlinks.ui.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>configure-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-commons-crud</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hswebframework.web</groupId>
+                    <artifactId>hsweb-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-redis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>microservice-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hswebframework.web</groupId>
+            <artifactId>hsweb-authorization-basic</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

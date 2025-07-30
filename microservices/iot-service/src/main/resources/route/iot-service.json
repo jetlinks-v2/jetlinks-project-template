@@ -1,0 +1,17 @@
+[
+    {
+        "path": "/messaging/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/dashboard/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/system/monitor/**",
+        "authorize": true,
+        "order": -1
+    }
+]

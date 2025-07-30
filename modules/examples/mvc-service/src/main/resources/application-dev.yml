@@ -1,0 +1,5 @@
+logging:
+    level:
+        root: info
+        org.jetlinks.pro: info
+        org.hswebframework: info

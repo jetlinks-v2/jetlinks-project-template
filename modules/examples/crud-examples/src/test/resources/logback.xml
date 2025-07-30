@@ -19,7 +19,7 @@
     <logger name="org.testcontainers" level="warn"/>
     <logger name="reactor" level="warn"/>
     <logger name="com.github" level="warn"/>
-    <logger name="org.jetlinks.project.example" level="debug"/>
+    <logger name="org.jetlinks.pro.example" level="debug"/>
     <logger name="io.scalecube" level="error"/>
 
     　

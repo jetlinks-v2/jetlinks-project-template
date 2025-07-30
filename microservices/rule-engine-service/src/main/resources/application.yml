@@ -1,0 +1,208 @@
+server:
+    port: 7300
+    error:
+        include-message: always
+    max-http-request-header-size: 200KB
+spring:
+    profiles:
+        active: default,dev,local
+    application:
+        name: rule-engine-service
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: Asia/Shanghai
+        serialization:
+            WRITE_DATES_AS_TIMESTAMPS: true
+        default-property-inclusion: non_null
+    web:
+        resources:
+            static-locations: file:./static,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/, classpath:/public/
+    r2dbc:
+        url: r2dbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:5432}/${DB_DATABASE:jetlinks}
+        username: ${DB_USERNAME:postgres}
+        password: ${DB_PASSWORD:jetlinks}
+        pool:
+            max-size: 128
+            max-idle-time: 60s
+            max-life-time: 1m
+            max-acquire-time: 10s
+        #    properties:
+        #      preparedStatementCacheQueries: 100
+    codec:
+        max-in-memory-size: 100MB
+    reactor:
+        debug-agent:
+            enabled: false # 开启调试代理,在打印异常时将会生成调用踪栈信息
+    elasticsearch:
+        uris: ${ES_URIS:localhost:9200} # ES集群地址,多个地址用逗号分隔
+        socket-timeout: 10s
+        connection-timeout: 15s
+        username: ${ES_USERNAME:""}
+        password: ${ES_PASSWORD:""}
+    data:
+        redis:
+            host: ${REDIS_HOST:127.0.0.1}
+            port: ${REDIS_PORT:6379}
+            timeout: 20s
+            password: ${REDIS_PASSWORD:iot@cloud}
+            database: ${REDIS_DATABASE:0}
+easyorm:
+    default-schema: ${DB_SCHEMA:public} # 数据库默认的schema
+    dialect: postgres #数据库方言
+elasticsearch:
+    index:
+        default-strategy: time-by-month #默认es的索引按月进行分表
+        settings:
+            number-of-shards: 1 # es 分片数量，通常对应es集群节点数量
+            number-of-replicas: 0 # 副本数量
+#      options:
+#        lifecycle.name: lifecycle_name # 在kibana中配置的生命周期
+hsweb:
+    dict:
+        enum-packages: org.jetlinks
+    webflux:
+        response-wrapper:
+            enabled: true #开启响应包装器(将返回值包装为ResponseMessage)
+            excludes: # 这下包下的接口不包装
+                - org.springdoc
+    authorize:
+        auto-parse: true
+    cache:
+        type: redis
+        redis:
+            local-cache-type: guava
+jetlinks:
+    server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
+    cluster:
+        id: ${jetlinks.server-id}
+        name: ${spring.application.name}
+        port: 1${server.port} # 集群通信通信本地端口
+        external-host: ${CLUSTER_EXTERNAL_HOST:127.0.0.1}  #集群节点通信对外暴露的host
+        external-port: ${CLUSTER_EXTERNAL_PORT:${jetlinks.cluster.port}} #集群节点通信对外暴露的端口
+        rpc-port: 2${server.port} # 集群节点本地RPC端口
+        rpc-external-host: ${RPC_EXTERNAL_HOST:${jetlinks.cluster.external-host}}  #集群节点RPC对外暴露host
+        rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
+        rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
+        seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        namespace: default,rule-engine
+        eventbus-includes:
+            iot-service: # 设备相关topic,只从iot-service节点订阅
+                - /device/**
+                - /org/*/device/**
+                - /user/*/device/**
+        config-storage-namespace: rule
+        depends-on:
+            - iot-service
+            - authentication-service
+    microservice:
+        discovery:
+            enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.
+        token:
+            jwt:
+                #用于解码jwt的公钥
+                decode-key: ${JWT_PUBLIC_KEY}
+    logging:
+        system:
+            context:
+                server: ${spring.application.name}
+    protocol:
+        spi:
+            enabled: false # 为true时开启自动加载通过依赖引入的协议包
+    application:
+        enabled: true
+        id: ${spring.application.name}
+        name: ${spring.application.name}
+        description: "规则引擎服务"
+    things:
+        data:
+            namespace: rule
+            auto-updater:
+                tags: [ "device" ]
+                properties: [ "device" ]
+            store:
+                max-size-each-property: 8
+device:
+    message:
+        kafka:
+            enabled: true  # 从kafka里接收设备数据，并转发到事件总线
+            bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:127.0.0.1:9092}
+            topic: ${DEVICE_MESSAGE_KAFKA_TOPIC:device_message}
+            consumer:
+                client-id: ${jetlinks.cluster.id}
+                group-id: ${spring.application.name}
+rule:
+    engine:
+        server-id: ${jetlinks.server-id}
+        server-name: ${spring.application.name}
+logging:
+    level:
+        org.jetlinks: info
+        rule.engine: info
+        org.hswebframework: info
+        org.springframework.transaction: info
+        org.springframework.data.r2dbc.connectionfactory: info
+        io.micrometer: warn
+        org.hswebframework.expands: error
+        system: info
+        org.jetlinks.rule.engine: info
+        org.jetlinks.gateway: info
+        org.springframework: warn
+        org.apache.kafka: warn
+        org.jetlinks.pro.device.message.writer: info
+        org.jetlinks.supports: warn
+        org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker: error
+        "org.elasticsearch.client.RestClient": error
+        "org.jetlinks.pro.buffer": warn
+        "org.hswebframework.web.starter.i18n": warn
+        "org.jetlinks.pro.tracing.LocalTracingService": warn
+        "org.jetlinks.pro.things.data.LocalFileThingsDataManager": warn
+        "io.rsocket": warn
+        "io.scalecube": warn
+        root: info
+    #    org.elasticsearch: error
+    logback:
+        rollingpolicy:
+            max-file-size: 100MB
+            max-history: 7
+            total-size-cap: 10GB
+    file:
+        name: ./data/logs/${spring.application.name}_${server.port}.log
+        path: ./data/logs
+    threshold:
+        file: INFO # 文件只记录INFO以上的日志
+        console: TRACE
+        event: WARN
+    config: classpath:logback-spring.xml
+springdoc:
+    group-configs:
+        -   group: 规则引擎相关接口
+            packages-to-scan:
+                - org.jetlinks.pro.rule.engine.web
+    cache:
+        disabled: false
+micrometer:
+    time-series:
+        tags:
+            server: ${jetlinks.server-id}
+        metrics:
+            default:
+                step: 30s
+        ignore:
+            - jetlinks-metrics #忽略内部监控信息
+management:
+    health:
+        elasticsearch:
+            enabled: false
+    elastic:
+        metrics:
+            export:
+                enabled: false
+    simple:
+        metrics:
+            export:
+                enabled: false
+trace:
+    enabled: true
+    jaeger:
+        enabled: false
+        endpoint: "http://127.0.0.1:14250"

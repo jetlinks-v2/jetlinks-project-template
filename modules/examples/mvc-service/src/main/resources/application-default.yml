@@ -1,0 +1,37 @@
+# 注意!!!,本地开发时,请创建application-local.yml文件进行配置,不要随意修改application-default.yml文件.
+
+# 数据库相关配置
+DB_HOST: 127.0.0.1 # postgresql 数据库地址
+DB_PORT: 5432 # postgresql 数据库端口
+DB_DATABASE: jetlinks # postgresql 数据库名
+DB_USERNAME: postgres # postgresql 数据库用户名
+DB_PASSWORD: jetlinks # postgresql 数据库密码
+DB_SCHEMA: public # postgresql 数据库schema,默认public
+
+# redis 相关配置
+REDIS_HOST: 127.0.0.1
+REDIS_PORT: 6379 # redis 数据库地址
+REDIS_PASSWORD: "iot@cloud" # redis 密码
+REDIS_DATABASE: 0 # redis 数据库索引
+
+# elasticsearch相关配置
+ES_URIS: 127.0.0.1:9200
+ES_USERNAME: "" # elasticsearch 用户名
+ES_PASSWORD: "" # elasticsearch 密码
+
+# 集群配置,请确保集群节点间的以下HOST和PORT能够互相访问到.
+CLUSTER_EXTERNAL_HOST: 127.0.0.1 # 集群间其他节点访问本节点的地址
+CLUSTER_EXTERNAL_PORT: ${jetlinks.cluster.port} # 1{server.port}
+
+RPC_EXTERNAL_HOST: ${CLUSTER_EXTERNAL_HOST} # 集群间当前节点对外提供RPC通信的地址
+RPC_EXTERNAL_PORT: 2${server.port} # 集群间当前节点对外提供RPC通信的端口
+
+RPC_TOKEN: J@t1iNksR9~ # 集群连接通信密钥
+
+# 集群种子节点地址,多个地址用逗号分隔,通常为api-gateway-service的{CLUSTER_EXTERNAL_HOST:CLUSTER_EXTERNAL_PORT}
+CLUSTER_SEEDS: 127.0.0.1:18800
+
+# jwt相关配置
+
+# 公钥,用于解码jwt
+JWT_PUBLIC_KEY: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==

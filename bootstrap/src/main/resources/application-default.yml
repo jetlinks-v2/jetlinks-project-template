@@ -1,0 +1,24 @@
+# 注意!!!,本地开发时,请创建application-local.yml文件进行配置,不要随意修改application-default.yml文件.
+
+#超级管理员初始密码
+ADMIN_USER_PASSWORD: HT@@sv2Pd0
+
+# 数据库相关配置
+DB_HOST: 127.0.0.1 # postgresql 数据库地址
+DB_PORT: 5432 # postgresql 数据库端口
+DB_DATABASE: jetlinks # postgresql 数据库名
+DB_USERNAME: postgres # postgresql 数据库用户名
+DB_PASSWORD: jetlinks # postgresql 数据库密码
+DB_SCHEMA: public  # 业务数据存储使用的schema
+
+# redis 相关配置
+REDIS_HOST: 127.0.0.1
+REDIS_PORT: 6379 # redis 数据库地址
+REDIS_PASSWORD: "iot@cloud" # redis 密码
+
+
+# elasticsearch相关配置
+ES_URIS: localhost:9200
+ES_USERNAME: "" # elasticsearch 用户名
+ES_PASSWORD: "" # elasticsearch 密码
+

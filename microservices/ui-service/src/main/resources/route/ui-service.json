@@ -1,0 +1,82 @@
+[
+    {
+        "path": "/",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/assets/*.js",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/assets/*.css",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/assets/*.svg",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/assets/*.png",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/ui/**",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/fonts/**",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/icons/**",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/images/**",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/monacoeditorwork/**",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/*.png",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/*.ico",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/manifest.json",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/v3/api-docs/swagger-config",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/doc.html",
+        "authorize": false,
+        "order": -1
+    },
+    {
+        "path": "/system/resources/ui",
+        "authorize": true,
+        "order": -1
+    }
+]

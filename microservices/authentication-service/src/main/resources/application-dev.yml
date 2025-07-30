@@ -1,0 +1,13 @@
+logging:
+  level:
+    org.jetlinks: debug
+    rule.engine: debug
+    org.hswebframework: debug
+    org.springframework.transaction: debug
+    org.springframework.data.r2dbc.connectionfactory: debug
+    io.micrometer: warn
+    org.jetlinks.rule.engine: debug
+    org.jetlinks.gateway: debug
+    org.springframework: warn
+    org.apache.kafka: warn
+    org.jetlinks.pro.device.message.writer: debug
