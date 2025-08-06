@@ -16,7 +16,7 @@
         <java.version>17</java.version>
         <project.build.jdk>${java.version}</project.build.jdk>
         <jetlinks.pro.version>2.11.0-SNAPSHOT</jetlinks.pro.version>
-        <spring.boot.version>3.4.3</spring.boot.version>
+        <spring.boot.version>3.4.8</spring.boot.version>
     </properties>
 
     <build>
