@@ -5,6 +5,9 @@
         "order": -1
     },
     {
+        "path": "/webjars/**"
+    },
+    {
         "path": "/assets/*.js",
         "authorize": false,
         "order": -1

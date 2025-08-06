@@ -5,8 +5,8 @@ server:
     max-http-request-header-size: 32MB
 spring:
     threads:
-      virtual:
-          enabled: false # java 21 开启虚拟线程
+        virtual:
+            enabled: false # java 21 开启虚拟线程
     profiles:
         active: default,dev,local
     application:
@@ -27,7 +27,7 @@ spring:
             WRITE_DATES_AS_TIMESTAMPS: true
         default-property-inclusion: non_null
         deserialization:
-          accept-single-value-as-array: true
+            accept-single-value-as-array: true
     web:
         resources:
             static-locations: file:./static,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/, classpath:/public/
@@ -67,6 +67,14 @@ hsweb:
 easyorm:
     default-schema: ${DB_SCHEMA:public} # 数据库默认的schema
     dialect: postgres #数据库方言
+springdoc:
+    group-configs:
+        -   group: ${spring.application.name}
+            display-name: Mvc示例服务
+            packages-to-scan:
+                - org.jetlinks.pro.crud.controller
+    cache:
+        disabled: false
 jetlinks:
     server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
     cluster:

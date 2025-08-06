@@ -18,5 +18,10 @@
         "path": "/notifications/**",
         "authorize": true,
         "order": -1
+    },
+    {
+        "path": "/v3/api-docs/notify-service",
+        "authorize": true,
+        "order": -1
     }
 ]

@@ -1,17 +1,22 @@
 [
-    {
-        "path": "/messaging/**",
-        "authorize": true,
-        "order": -1
-    },
-    {
-        "path": "/dashboard/**",
-        "authorize": true,
-        "order": -1
-    },
-    {
-        "path": "/system/monitor/**",
-        "authorize": true,
-        "order": -1
-    }
+  {
+    "path": "/messaging/**",
+    "authorize": true,
+    "order": -1
+  },
+  {
+    "path": "/dashboard/**",
+    "authorize": true,
+    "order": -1
+  },
+  {
+    "path": "/system/monitor/**",
+    "authorize": true,
+    "order": -1
+  },
+  {
+    "path": "/v3/api-docs/iot-service",
+    "authorize": true,
+    "order": -1
+  }
 ]

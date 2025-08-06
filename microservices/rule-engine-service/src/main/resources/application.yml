@@ -175,7 +175,8 @@ logging:
     config: classpath:logback-spring.xml
 springdoc:
     group-configs:
-        -   group: 规则引擎相关接口
+        -   group: ${spring.application.name}
+            display-name: 规则引擎服务
             packages-to-scan:
                 - org.jetlinks.pro.rule.engine.web
     cache:

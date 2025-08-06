@@ -1,0 +1,7 @@
+[
+    {
+        "path": "/v3/api-docs/mvc-service",
+        "authorize": true,
+        "order": -1
+    }
+]

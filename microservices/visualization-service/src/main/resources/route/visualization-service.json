@@ -1,0 +1,7 @@
+[
+    {
+        "path": "/v3/api-docs/visualization-service",
+        "authorize": true,
+        "order": -1
+    }
+]

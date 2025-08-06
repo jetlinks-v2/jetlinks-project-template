@@ -18,5 +18,10 @@
         "path": "/scene/**",
         "authorize": true,
         "order": -1
+    },
+    {
+        "path": "/v3/api-docs/rule-engine-service",
+        "authorize": true,
+        "order": -1
     }
 ]

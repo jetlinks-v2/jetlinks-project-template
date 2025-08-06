@@ -61,7 +61,6 @@ elasticsearch:
 #        lifecycle.name: lifecycle_name # 在kibana中配置的生命周期
 
 hsweb:
-
     dict:
         enum-packages: org.jetlinks
     webflux:
@@ -155,7 +154,8 @@ logging:
     config: classpath:logback-spring.xml
 springdoc:
     group-configs:
-        -   group: 消息通知相关接口
+        -   group: ${spring.application.name}
+            display-name: 消息通知服务
             packages-to-scan:
                 - org.jetlinks.pro.notify
     cache:
