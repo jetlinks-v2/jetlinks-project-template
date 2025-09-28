@@ -203,6 +203,21 @@ springdoc:
         disabled: false
     security:
         enabled: true
+    swagger-ui:
+        urls:
+            - url: /v3/api-docs/iot-service
+              name: 设备管理服务
+            - url: /v3/api-docs/notify-service
+              name: 消息通知服务
+            - url: /v3/api-docs/rule-engine-service
+              name: 规则引擎服务
+            - url: /v3/api-docs/visualization-service
+              name: 可视化服务
+            - url: /v3/api-docs/mvc-service
+              name: MVC示例服务
+        use-root-path: false
+        enabled: true
+        disable-swagger-default-url: true
 system:
     config:
         scopes:

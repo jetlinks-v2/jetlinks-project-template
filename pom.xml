@@ -162,6 +162,8 @@
                 <module>modules/examples/websocket-example</module>
                 <module>modules/examples/expand-property-example</module>
                 <module>modules/examples/thirdparty-iam-example</module>
+                <module>modules/examples/mvc-example</module>
+                <module>modules/examples/mvc-service</module>
             </modules>
         </profile>
 

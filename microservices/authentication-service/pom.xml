@@ -158,6 +158,18 @@
             <artifactId>rule-engine-component</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-ui</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

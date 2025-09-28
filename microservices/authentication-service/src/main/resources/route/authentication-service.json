@@ -23,5 +23,20 @@
         "path": "/command-supports/**",
         "authorize": false,
         "order": -1
+    },
+    {
+        "path": "/logger/**",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/v3/api-docs/swagger-config",
+        "authorize": true,
+        "order": -1
+    },
+    {
+        "path": "/doc.html",
+        "authorize": false,
+        "order": -1
     }
 ]

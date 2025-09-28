@@ -182,6 +182,19 @@
             </dependencies>
         </profile>
 
+        <profile>
+            <id>media</id>
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>media-manager</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
         <!-- 云端录像模块 (选配) -->
         <profile>
             <id>media-recorder</id>
@@ -318,18 +331,6 @@
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>datasource-manager</artifactId>
             <version>${jetlinks.pro.version}</version>
-        </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.jetlinks.pro</groupId>-->
-<!--            <artifactId>things-manager</artifactId>-->
-<!--            <version>${jetlinks.pro.version}</version>-->
-<!--        </dependency>-->
-
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>media-manager</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

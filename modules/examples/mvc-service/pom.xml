@@ -51,7 +51,7 @@
     </build>
 
     <dependencies>
-
+        <!-- !!这个依赖必须放在最前面!! -->
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>common-component</artifactId>
@@ -59,13 +59,18 @@
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
-            <artifactId>configure-component</artifactId>
-            <version>${jetlinks.pro.version}</version>
+            <artifactId>mvc-example</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.hswebframework.web</groupId>
-            <artifactId>hsweb-starter</artifactId>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>logging-component</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>configure-component</artifactId>
         </dependency>
 
         <dependency>
@@ -125,30 +130,6 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>dashboard-component</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>gateway-component</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>io-component</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>assets-component</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetlinks.pro</groupId>
-            <artifactId>logging-component</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>

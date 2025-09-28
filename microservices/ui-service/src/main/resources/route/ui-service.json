@@ -68,16 +68,6 @@
         "order": -1
     },
     {
-        "path": "/v3/api-docs/swagger-config",
-        "authorize": true,
-        "order": -1
-    },
-    {
-        "path": "/doc.html",
-        "authorize": false,
-        "order": -1
-    },
-    {
         "path": "/system/resources/ui",
         "authorize": true,
         "order": -1
