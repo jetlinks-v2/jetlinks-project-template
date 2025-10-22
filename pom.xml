@@ -164,6 +164,7 @@
                 <module>modules/examples/thirdparty-iam-example</module>
                 <module>modules/examples/mvc-example</module>
                 <module>modules/examples/mvc-service</module>
+                <module>modules/cloud-patrol</module>
             </modules>
         </profile>
 

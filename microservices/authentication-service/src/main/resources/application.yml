@@ -213,8 +213,6 @@ springdoc:
               name: 规则引擎服务
             - url: /v3/api-docs/visualization-service
               name: 可视化服务
-            - url: /v3/api-docs/mvc-service
-              name: MVC示例服务
         use-root-path: false
         enabled: true
         disable-swagger-default-url: true

@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "description": "JetLinks 项目 Claude Code 开发配置",
+  "rules": [
+    {
+      "name": "基础开发规则",
+      "file": ".claude/rules.md",
+      "priority": 1,
+      "alwaysApply": true,
+      "description": "JetLinks 开发的基础规则和流程"
+    },
+    {
+      "name": "高级开发规则",
+      "file": ".claude/advanced-rules.md",
+      "priority": 2,
+      "alwaysApply": true,
+      "description": "Claude Code 工具使用指南和高级开发技巧"
+    }
+  ],
+  "prompts": {
+    "development_start": "开发相关问题请遵循 .claude/rules.md 中的规则",
+    "code_generation": "生成代码前请先搜索现有实现，验证类的存在性",
+    "module_creation": "创建新模块请使用 .prompt/module-creation-rules.md",
+    "crud_development": "CRUD 开发请使用 .prompt/common-crud-rules.md",
+    "cross_service": "跨服务调用请使用 .prompt/cross-service-call-rules.md",
+    "realtime_subscription": "实时数据订阅请使用 .prompt/realtime-subscription-rules.md",
+    "event_driven": "事件驱动开发请使用 .prompt/event-driven-rules.md"
+  },
+  "workflow": {
+    "steps": [
+      "识别任务类型",
+      "搜索现有代码实现",
+      "阅读相关规则文件",
+      "验证类和方法的正确性",
+      "基于真实代码生成新代码",
+      "检查代码质量和完整性"
+    ],
+    "search_priority": [
+      "当前模块内搜索",
+      "相似模块搜索",
+      "框架源码搜索",
+      "文档规则搜索"
+    ]
+  },
+  "conventions": {
+    "naming": {
+      "module": "kebab-case",
+      "package": "camelCase",
+      "class": "PascalCase",
+      "variable": "camelCase"
+    },
+    "required_annotations": [
+      "@Table",
+      "@Comment",
+      "@Service",
+      "@RestController",
+      "@Authorize",
+      "@Operation"
+    ],
+    "verification_required": true,
+    "code_first_principle": true
+  }
+}

@@ -87,6 +87,8 @@ jetlinks:
         rpc-external-port: ${RPC_EXTERNAL_PORT:${jetlinks.cluster.rpc-port}} #集群节点RPC对外暴露端口
         rpc-token: ${RPC_TOKEN:J@t1iNksR9~} # 集群节点RPC通信token,生产环境请修改
         seeds: ${CLUSTER_SEEDS:127.0.0.1:18800} #集群种子节点,集群时,配置为api网关节点的 external-host:external-port
+        depends-on:
+            - authentication-service # 依赖认证服务,订阅初始化需要获取用户信息.
     microservice:
         discovery:
             enabled: true # 开启平台内置的服务发现,需要设置jetlinks.cluster.seeds为网关服务以加入集群.

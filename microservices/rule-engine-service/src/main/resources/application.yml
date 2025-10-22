@@ -90,7 +90,7 @@ jetlinks:
                 - /device/**
                 - /org/*/device/**
                 - /user/*/device/**
-        config-storage-namespace: rule
+        config-storage-namespace: iot,rule
         depends-on:
             - iot-service
             - authentication-service
@@ -115,21 +115,12 @@ jetlinks:
         description: "规则引擎服务"
     things:
         data:
-            namespace: rule
+            namespace: _default
             auto-updater:
                 tags: [ "device" ]
                 properties: [ "device" ]
             store:
                 max-size-each-property: 8
-device:
-    message:
-        kafka:
-            enabled: true  # 从kafka里接收设备数据，并转发到事件总线
-            bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:127.0.0.1:9092}
-            topic: ${DEVICE_MESSAGE_KAFKA_TOPIC:device_message}
-            consumer:
-                client-id: ${jetlinks.cluster.id}
-                group-id: ${spring.application.name}
 rule:
     engine:
         server-id: ${jetlinks.server-id}

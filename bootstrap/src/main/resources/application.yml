@@ -234,6 +234,38 @@ logging:
         file: INFO # 文件只记录INFO以上的日志
         console: TRACE
         event: WARN # 事件日志只记录WARN以上的日志
+
+zlmedia:
+    embedded:
+        config:
+            # 单个录像文件最大时长,单位秒
+            "protocol.mp4_max_second": "300"
+            # 通过流媒体直接播放时是否允许跨域
+            "http.allow_cross_domains": 1
+            # rtp 推g711音频的间隔
+            "rtp_proxy.rtp_g711_dur_ms": 20
+            # rtp 超时代理时间
+            "rtp_proxy.timeoutSec": 99999
+            # PCMA 优先,语音对讲场景下,设置摄像头语音格式为最前面的格式
+            "rtc.preferredCodecA": "PCMA,PCMU,opus,mpeg4-generic"
+            # 延迟推送无人观看通知
+            "general.streamNoneReaderDelayMS": 1000
+    # 以下配置建议使用内嵌流媒体时开启
+    play:
+        # 开启视频播放权限校验
+        device-auth:
+            enabled: true
+        # 开启播放时自动推流,通过分享链接播放时自动点播并推流.
+        device-auto-push:
+            enabled: true
+            stop-when-no-player: true # 无人播放自动停止推流
+            stop-check-interval: 60s # 自动停止检查间隔
+    hook:
+        # 开启hook权限校验
+        auth:
+            enabled: true
+    cluster:
+        enabled: false
 vertx:
     max-event-loop-execute-time-unit: seconds
     max-event-loop-execute-time: 30
@@ -358,14 +390,6 @@ network:
         - 1883-1890
         - 8800-8810
         - 5060-5061
-frp:
-    enabled: false # 是否启用边缘网关-远程控制
-    config:
-        publicHost: 127.0.0.1 # frp服务公网IP
-        bindPort: 7000 # frp服务接入端口
-        token: jetlinks # 密钥
-        resources:
-            - 8811-8820/tcp # 可用的端口
 timescaledb:
     enabled: false
     shared-spring: true # 当平台也使用timescaledb时可以设置为true,共享平台的数据库连接.

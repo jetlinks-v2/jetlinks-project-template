@@ -38,23 +38,4 @@ public class Application {
         SpringApplication.run(Application.class,args);
     }
 
-    //admin 有全部接口权限
-    @Component
-    @Slf4j
-    public static class AdminAllAccess {
-
-        @EventListener
-        public void handleAuthEvent(AuthorizingHandleBeforeEvent e) {
-            if (e.getContext().getAuthentication().getUser().getUsername().equals("admin")) {
-                e.setAllow(true);
-            }
-        }
-
-        @EventListener
-        public void handleAccessLogger(AccessLoggerAfterEvent event) {
-
-            log.info("{}=>{} {}-{}", event.getLogger().getIp(), event.getLogger().getUrl(), event.getLogger().getDescribe(), event.getLogger().getAction());
-
-        }
-    }
 }

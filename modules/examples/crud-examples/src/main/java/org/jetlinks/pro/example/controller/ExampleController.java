@@ -114,8 +114,10 @@ public class ExampleController implements AssetsHolderCrudController<ExampleEnti
     @GetMapping("/_detail/_query_native")
     public Mono<PagerResult<ExampleInfo>> nativeJoinExample(QueryParamEntity query) {
         return queryHelper
-            .select("select t.*,ext.* from example_crud t" +
-                        " left join example_crud_ext ext on ext.example_id = t.id",
+            .select("""
+                        select t.*,ext.* from example_crud t
+                        left join example_crud_ext ext on ext.example_id = t.id
+                        """,
                     ExampleInfo::new)
             //根据前端的动态条件参数自动构造查询条件以及分页排序等信息
             .where(query)
