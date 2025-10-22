@@ -996,7 +996,7 @@ cd modules/模块名 && mvn dependency:tree
 - [module-reference.md](./module-reference.md) - 模块详细说明和使用示例
 - [common-crud-rules.md](./common-crud-rules.md) - CRUD 开发规范
 - [cross-service-call-rules.md](./cross-service-call-rules.md) - 跨服务调用规范
-- [README.md](../README.md) - 开发辅助工具总览
+- [ai-prompt.md](../ai-prompt.md) - 开发辅助工具总览
 
 ---
 

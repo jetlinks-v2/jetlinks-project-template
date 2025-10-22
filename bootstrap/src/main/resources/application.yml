@@ -334,7 +334,15 @@ api:
         big-screen-path: http://localhost:9002/
     base-path: http://127.0.0.1:${server.port}/
 trace:
-    enabled: true
+    enabled: false
+    otlp:
+        enabled: false
+        endpoint: "http://127.0.0.1:4317"
+    local-store:
+        enabled: true
+        max-store-time: 30m
+        max-store-size: 1000000
+        error-only: false
 system:
     config:
         scopes:

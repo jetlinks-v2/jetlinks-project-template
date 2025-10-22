@@ -51,7 +51,6 @@
     },
     "required_annotations": [
       "@Table",
-      "@Comment",
       "@Service",
       "@RestController",
       "@Authorize",

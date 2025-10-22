@@ -12,6 +12,7 @@
 - [使用场景决策树](#使用场景决策树)
 - [完整示例](#完整示例)
 - [快速参考](#快速参考)
+- [注解和导入语句参考](#注解和导入语句参考)
 
 ---
 
@@ -23,6 +24,7 @@
 
 1. **首先判断任务类型**：
     - **不知道有哪些模块** → 先查看 [module-list](.prompt/module-list.md)
+    - **不确定注解和包名** → 先查看 [annotations-and-imports-reference](.prompt/annotations-and-imports-reference.md)
     - 创建新模块 → 使用 [module-creation-rules](.prompt/module-creation-rules.md)
     - 在现有模块中添加基础 CRUD 功能 → 使用 [common-crud-rules](.prompt/common-crud-rules.md)
     - **CRUD 进阶使用**（事件驱动、复杂查询、编程模式选择） → 使用 [advanced-crud-rules](.prompt/advanced-crud-rules.md)
@@ -454,6 +456,21 @@ CRUD 进阶使用决策流程：
    3. 验证类存在性和方法签名
    4. 参考真实代码生成新代码
    5. 说明代码参考了哪个现有实现
+   ```
+
+1.5. **🔴 重要：正确使用注解和包名**
+   ```
+   ⚠️ 注解使用规范：
+   - @Table 和 @Column 使用 JPA 注解：javax.persistence.Table, javax.persistence.Column
+   - @EnableEntityEvent 使用 HSWeb 注解：org.hswebframework.web.crud.annotation.EnableEntityEvent
+   - @ColumnType 等其他注解使用 HSWeb/EasyORM 注解
+   
+   ⚠️ 工具类包名：
+   - FastBeanCopier 完整包名：org.hswebframework.web.bean.FastBeanCopier
+   - 不要使用错误的包名如：org.jetlinks.pro.fastjson.FastBeanCopier
+   
+   ✅ 必须：在生成代码前，搜索现有代码验证导入语句
+   ✅ 必须：使用项目中实际使用的注解和包名
    ```
 
 2. **始终读取完整规则**
@@ -950,6 +967,52 @@ implements CrudCommandHandler<Entity, String>
 
 ---
 
+## 📖 注解和导入语句参考
+
+### 重要提醒
+
+在生成实体类代码时，必须使用正确的注解和包名。详细信息请参考：[annotations-and-imports-reference](.prompt/annotations-and-imports-reference.md)
+
+### 核心要点
+
+1. **JPA 注解**（使用 `javax.persistence`）
+   ```java
+   import javax.persistence.Column;  // ✅ 正确
+   import javax.persistence.Table;   // ✅ 正确
+   ```
+
+2. **HSWeb 注解**
+   ```java
+   import org.hswebframework.web.crud.annotation.EnableEntityEvent;  // ✅ 正确
+   import org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType; // ✅ 正确
+   ```
+
+3. **FastBeanCopier**
+   ```java
+   import org.hswebframework.web.bean.FastBeanCopier;  // ✅ 正确
+   ```
+
+### 常见错误
+
+```java
+// ❌ 错误：不要使用 HSWeb 的 @Table 和 @Column
+import org.hswebframework.ezorm.rdb.mapping.annotation.Table;
+import org.hswebframework.ezorm.rdb.mapping.annotation.Column;
+
+// ❌ 错误：不要使用错误的 FastBeanCopier 包名
+import org.jetlinks.pro.fastjson.FastBeanCopier;
+```
+
+### 验证方法
+
+在生成代码前，使用以下命令验证：
+```bash
+grep -r "import javax.persistence.Table" modules/
+grep -r "import org.hswebframework.web.bean.FastBeanCopier" modules/
+```
+
+---
+
 ## ⚠️ AI 重要提醒
 
 **在使用本开发辅助工具时，请牢记以下核心原则：**
@@ -964,6 +1027,7 @@ implements CrudCommandHandler<Entity, String>
 │  ✅ 必须阅读真实实现示例                          │
 │  ✅ 必须验证类和方法存在                          │
 │  ✅ 必须基于实际代码生成                          │
+│  ✅ 必须使用正确的注解和包名                      │
 │                                                 │
 │  记住：你的优势是搜索和理解，而不是凭空创造        │
 │                                                 │

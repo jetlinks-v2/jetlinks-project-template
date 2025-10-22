@@ -41,15 +41,15 @@
 
 ### 任务类型判断
 
-| 用户需求 | 使用规则 | 说明 |
-|---------|---------|------|
-| 创建新模块 | `.prompt/module-creation-rules.md` | 完整的 Maven 模块创建 |
-| 添加 CRUD 功能 | `.prompt/common-crud-rules.md` | Entity/Service/Controller 开发 |
-| 跨服务调用 | `.prompt/cross-service-call-rules.md` | 命令模式 RPC 调用 |
-| 实时数据订阅 | `.prompt/realtime-subscription-rules.md` | @Subscribe 注解使用 |
-| 事件驱动开发 | `.prompt/event-driven-rules.md` | @EventListener 使用 |
-| 查看可用模块 | `.prompt/module-list.md` | 模块列表和 Maven 依赖 |
-| 模块选择决策 | `.prompt/module-reference.md` | 模块引入 vs 跨服务调用 |
+| 用户需求       | 使用规则                                     | 说明                           |
+|------------|------------------------------------------|------------------------------|
+| 创建新模块      | `.prompt/module-creation-rules.md`       | 完整的 Maven 模块创建               |
+| 添加 CRUD 功能 | `.prompt/common-crud-rules.md`           | Entity/Service/Controller 开发 |
+| 跨服务调用      | `.prompt/cross-service-call-rules.md`    | 命令模式 RPC 调用                  |
+| 实时数据订阅     | `.prompt/realtime-subscription-rules.md` | @Subscribe 注解使用              |
+| 事件驱动开发     | `.prompt/event-driven-rules.md`          | @EventListener 使用            |
+| 查看可用模块     | `.prompt/module-list.md`                 | 模块列表和 Maven 依赖               |
+| 模块选择决策     | `.prompt/module-reference.md`            | 模块引入 vs 跨服务调用                |
 
 ### Claude Code 工具使用
 

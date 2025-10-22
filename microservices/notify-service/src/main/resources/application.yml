@@ -185,6 +185,11 @@ management:
                 enabled: false
 trace:
     enabled: true
-    jaeger:
+    otlp:
         enabled: false
-        endpoint: "http://127.0.0.1:14250"
+        endpoint: "http://127.0.0.1:4317"
+    local-store:
+        enabled: true
+        max-store-time: 30m
+        max-store-size: 1000000
+        error-only: false

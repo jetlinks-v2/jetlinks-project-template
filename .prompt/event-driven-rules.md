@@ -286,7 +286,6 @@ public class ExampleClusterEventListener implements ClusterEntityEventListener<E
 
 ```java
 @Table(name = "example_entity")
-@Comment("示例实体")
 @EnableEntityEvent  // 开启实体事件
 public class ExampleEntity extends GenericEntity<String> {
     // 实体定义

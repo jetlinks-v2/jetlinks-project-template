@@ -21,6 +21,37 @@ JetLinks 支持两种编程模式：
 
 本规范同时包含两种模式的开发指南。
 
+## ⚠️ 重要：AI 代码生成核心原则
+
+### 🔴 最小化代码生成原则（必读！）
+
+**在生成任何代码前，请务必遵守以下核心原则**：
+
+1. **只生成用户明确要求的代码**
+   - ❌ 不要创建用户没有明确说明的功能
+   - ❌ 不要创建"示例"或"演示"代码
+   - ❌ 不要创建"可能有用"的辅助方法
+   - ✅ 严格按照用户提供的需求生成代码
+   - ✅ 如果不确定，先询问用户
+
+2. **保持代码简洁**
+   - Service 层：空实现即可，所有 CRUD 功能通过父类提供
+   - Controller 层：空实现即可，所有标准接口通过接口继承提供
+   - 只在用户明确要求或确实需要时才添加自定义方法
+
+3. **利用框架提供的能力**
+   - 动态查询：通过 `POST /_query` 接口支持所有查询场景
+   - 标准 CRUD：通过接口继承自动提供
+   - 不需要为每个字段创建查询方法
+
+4. **避免过度设计**
+   - ❌ 不要"预测"用户需求
+   - ❌ 不要创建"完整"的示例
+   - ✅ 生成最小可用代码
+   - ✅ 让用户按需扩展
+
+---
+
 ## ⚠️ 重要：编程模式选择
 
 **在开始生成代码前，必须先询问用户选择编程模式：**
@@ -107,9 +138,9 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 
 - 继承 `GenericEntity<String>` 或 `GenericTreeSortSupportEntity<String>`
 - 实现 `RecordCreationEntity` 和 `RecordModifierEntity` 接口
-- 添加 `@Table(name = "表名")` 和 `@Comment("表注释")`
+- 添加 `@Table(name = "表名")` - **注意：使用 JPA 的注解 `javax.persistence.Table`**
 - 添加 `@EnableEntityEvent` 启用实体事件支持
-- 使用 `@Column` 标记字段，设置长度、是否可更新等属性
+- 使用 `@Column` 标记字段，设置长度、是否可更新等属性 - **注意：使用 JPA 的注解 `javax.persistence.Column`**
 - 使用 `@Schema` 提供API文档描述
 - 使用 `@JsonCodec` 处理JSON字段
 - 使用 `@EnumCodec` 处理枚举字段
@@ -129,6 +160,7 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 - 添加 `toInfo()` 方法，使用 `FastBeanCopier.copy(this, VO::new)`
 - 添加 `toDetail()` 方法，处理特殊字段转换
 - 导入对应的VO类
+- **注意：FastBeanCopier 的完整包名为 `org.hswebframework.web.bean.FastBeanCopier`**
 
 ### 2.2 树形实体类规范
 
@@ -157,17 +189,16 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 
 #### 核心注解
 
-- `@Table(name = "表名")`: 指定数据库表名
-- `@Comment("注释")`: 表或字段的注释
-- `@EnableEntityEvent`: 启用实体事件支持
+- `@Table(name = "表名")`: 指定数据库表名 - **使用 `javax.persistence.Table`**
+- `@EnableEntityEvent`: 启用实体事件支持 - **使用 `org.hswebframework.web.crud.annotation.EnableEntityEvent`**
 
 #### 字段注解
 
-- `@Column`: 标记字段为数据库列
+- `@Column`: 标记字段为数据库列 - **使用 `javax.persistence.Column`**
     - `length`: 字段长度
     - `updatable`: 是否可更新(默认true)
     - `nullable`: 是否允许为空(默认true)
-- `@ColumnType`: 指定JDBC类型和Java类型
+- `@ColumnType`: 指定JDBC类型和Java类型 - **使用 `org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType`**
 - `@JsonCodec`: 自动将Java对象序列化为JSON存储
 - `@EnumCodec`: 枚举类型编解码
     - `toMask = true`: 使用位掩码存储多个枚举值(用于数组)
@@ -322,6 +353,36 @@ public Flux<Entity> findByField3(String field3) { ...}
 - 使用 `@Transactional` 注解管理事务
 - 复杂业务逻辑可组合使用 `createQuery()`、`createUpdate()`、`createDelete()`
 
+#### ⚠️ 代码生成最小化原则
+
+**AI 在生成代码时，请严格遵守以下原则**：
+
+1. **只生成用户明确要求的功能**
+   - ❌ 不要创建示例查询方法（如 `findByName`、`findByType` 等）
+   - ❌ 不要创建用户未要求的业务逻辑方法
+   - ✅ 只生成基础的 Service 类，继承 `GenericReactiveCrudService` 或 `GenericCrudService` 即可
+
+2. **Service 层应该尽可能简洁**
+   ```java
+   // ✅ 推荐：简洁的 Service 类
+   @Service
+   @Slf4j
+   public class CategoryPointService extends GenericCrudService<CategoryPointEntity, String> {
+       // 空实现即可，所有 CRUD 功能已通过父类提供
+   }
+   ```
+
+3. **只在以下情况添加自定义方法**
+   - 用户明确要求某个特定查询方法
+   - 存在复杂的业务逻辑（如级联删除、数据验证等）
+   - 需要事务控制的复合操作
+   - 需要调用其他服务的业务逻辑
+
+4. **避免过度设计**
+   - ❌ 不要"猜测"用户可能需要什么功能
+   - ❌ 不要创建"可能有用"的辅助方法
+   - ✅ 保持代码简洁，让用户按需添加
+
 ### 4.2 树形服务类开发规范
 
 如果实体需要支持树形结构：
@@ -473,6 +534,78 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
 - 使用 `@DeleteAction` 标记删除操作
 - 使用 `@Operation` 提供接口描述
 - 返回类型使用 `Mono<T>` 或 `Flux<T>`
+
+#### ⚠️ Controller 代码生成最小化原则
+
+**AI 在生成 Controller 代码时，请严格遵守以下原则**：
+
+1. **只生成用户明确要求的接口**
+   - ❌ 不要创建示例查询接口（如 `findByCategoryId`、`findByType` 等）
+   - ❌ 不要创建用户未要求的业务接口
+   - ❌ 不要创建"可能有用"的辅助接口
+   - ✅ 只生成基础的 Controller 类，实现对应的 CRUD 接口即可
+
+2. **Controller 层应该尽可能简洁**
+   ```java
+   // ✅ 推荐：简洁的 Controller 类
+   @RestController
+   @RequestMapping("/cloud-patrol/category-point")
+   @AllArgsConstructor
+   @Getter
+   @Slf4j
+   @Resource(id = "cloud-patrol-category-point", name = "分类点位管理")
+   @Tag(name = "分类点位管理")
+   @AssetsController(type = "cloud-patrol")
+   public class CategoryPointController implements BlockingAssetsHolderCrudController<CategoryPointEntity, String> {
+
+       private final CategoryPointService service;
+
+       // 空实现即可，所有标准 CRUD 接口已通过接口提供
+       // 如：GET /{id}, POST /_query, POST /, PUT /{id}, DELETE /{id} 等
+   }
+   ```
+
+3. **标准 CRUD 接口已自动提供**
+
+   通过实现 `AssetsHolderCrudController` 或 `BlockingAssetsHolderCrudController`，以下接口自动可用：
+   - `GET /{id}` - 根据ID查询
+   - `POST /_query` - 分页查询（支持动态条件）
+   - `GET /_query/no-paging` - 不分页查询
+   - `GET /_count` - 统计数量
+   - `POST /` 或 `PATCH /` - 保存/批量保存
+   - `PUT /{id}` - 更新
+   - `DELETE /{id}` - 删除
+
+   **这些接口不需要在代码中重复定义！**
+
+4. **只在以下情况添加自定义接口**
+   - 用户明确要求某个特定接口
+   - 需要导出、导入等特殊功能
+   - 需要复杂的业务逻辑（不是简单查询）
+   - 需要调用其他服务的接口
+
+5. **避免过度设计**
+   - ❌ 不要"猜测"用户可能需要什么接口
+   - ❌ 不要为每个字段创建查询接口
+   - ❌ 不要创建"便捷"的辅助接口
+   - ✅ 保持代码简洁，依赖动态查询功能
+   - ✅ 让用户通过 `POST /_query` 接口灵活查询
+
+6. **动态查询已经足够强大**
+
+   用户可以通过 `POST /_query` 接口实现各种查询：
+   ```json
+   {
+     "where": [
+       {"column": "categoryId", "value": 1},
+       {"column": "pointName", "value": "test", "termType": "like"}
+     ],
+     "pageIndex": 0,
+     "pageSize": 20
+   }
+   ```
+
+   **不需要为每种查询创建单独的接口！**
 
 ### 5.2 树形结构控制器规范
 
@@ -1040,6 +1173,8 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
 
 当用户要求创建一个新的CRUD模块时，按照以下步骤生成代码:
 
+**⚠️ 重要提醒：在生成代码前，请重新阅读"AI 代码生成核心原则"部分！**
+
 1. **⚠️ 首先询问编程模式**
    ```
    请选择您要使用的编程模式：
@@ -1096,7 +1231,8 @@ modules/{模块名}/
         - **响应式**: 继承GenericReactiveCrudService或GenericReactiveTreeSupportCrudService
         - **阻塞式**: 继承GenericCrudService
         - 添加@Service和@Slf4j注解
-        - 根据业务需求添加自定义方法
+        - ⚠️ **默认生成空实现**，不添加任何自定义方法
+        - ⚠️ 只有在用户明确要求时才添加自定义方法
 
 4. **生成API模块代码**
     - **VO类**: 在api模块中生成VO类
@@ -1107,13 +1243,14 @@ modules/{模块名}/
         - 创建请求VO: `Create{实体名}Request`
         - 更新请求VO: `Update{实体名}Request`
 
-    - **控制器类**: 在api模块中生成Controller类
+    - **控制器类**: 在manager模块的web包中生成Controller类
         - **响应式**: 实现AssetsHolderCrudController接口
         - **阻塞式**: 实现BlockingAssetsHolderCrudController接口
         - 添加完整的权限注解(@Resource, @Authorize, @AssetsController)
         - 添加Swagger注解(@Tag, @Operation)
-        - 根据需求添加自定义接口
-        - **重要**: Controller中调用manager模块的Service，返回VO对象
+        - ⚠️ **默认生成空实现**，不添加任何自定义接口
+        - ⚠️ 只有在用户明确要求时才添加自定义接口
+        - **重要**: Controller中调用Service，返回Entity对象（框架会自动处理）
 
 5. **生成国际化文件**
     - 在resources/i18n/{模块名}/目录下创建消息文件
@@ -1222,6 +1359,7 @@ modules/{模块名}/
 - 基于字节码生成，性能接近手写代码
 - 使用简单，支持Supplier方式创建目标对象
 - 缓存生成的拷贝器，性能优秀
+- **完整包名**: `org.hswebframework.web.bean.FastBeanCopier`
 
 ---
 
@@ -1371,13 +1509,118 @@ modules/{模块名}/
 - **⚠️ 必须首先询问用户选择编程模式**，使用标准询问模板
 - 如果用户未明确说明，**默认使用响应式模式**（项目主流）
 - **严格按照模块分离原则**:
-    - API模块: 创建VO类 + Controller类
-    - Manager模块: 创建Entity类 + Service类
+    - API模块: 创建VO类
+    - Manager模块: 创建Entity类 + Service类 + Controller类
 - 根据用户选择的编程模式，使用对应的代码模板：
     - **响应式模式**: 使用响应式Service和Controller模板
     - **阻塞式模式**: 使用阻塞式Service和Controller模板
 - 确保生成的代码包含所有必需的注解和配置
-- 生成代码时考虑完整性: Entity + Service + VO + Controller + 测试
+- 生成代码时考虑完整性: Entity + Service + VO + Controller + 国际化文件
 - 提供清晰的代码说明和使用示例
 - 必要时说明两种模式的差异和选择建议
+
+---
+
+## 🔴 AI 最后检查清单（生成代码前必读！）
+
+在生成任何代码之前，请确认以下事项：
+
+### ✅ 需求确认
+- [ ] 我已经完全理解用户的需求
+- [ ] 用户已明确选择了编程模式（响应式/阻塞式）
+- [ ] 我知道需要创建哪些类（Entity、Service、Controller、VO）
+- [ ] 我知道用户明确要求的自定义功能（如果有）
+
+### ✅ 代码简洁性
+- [ ] Service 类：我只生成空实现（除非用户明确要求自定义方法）
+- [ ] Controller 类：我只生成空实现（除非用户明确要求自定义接口）
+- [ ] 我没有创建"示例"或"演示"方法
+- [ ] 我没有创建用户未明确要求的辅助方法
+
+### ✅ 框架能力利用
+- [ ] 我知道动态查询可以满足大部分查询需求
+- [ ] 我知道标准 CRUD 接口已通过接口继承提供
+- [ ] 我没有为每个字段创建查询方法
+- [ ] 我没有重复定义已有的接口
+
+### ✅ 避免过度设计
+- [ ] 我没有"猜测"用户可能需要什么
+- [ ] 我没有创建"完整"的功能示例
+- [ ] 我生成的是最小可用代码
+- [ ] 我让用户按需扩展
+
+**如果以上所有项都确认无误，才可以开始生成代码！**
+
+---
+
+## 📋 标准代码模板示例
+
+### Service 层标准模板（推荐）
+
+```java
+package org.jetlinks.pro.example.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.hswebframework.web.crud.service.GenericCrudService; // 或 GenericReactiveCrudService
+import org.jetlinks.pro.example.entity.ExampleEntity;
+import org.springframework.stereotype.Service;
+
+/**
+ * 示例服务类
+ *
+ * @author JetLinks
+ * @since 2.11.0
+ */
+@Service
+@Slf4j
+public class ExampleService extends GenericCrudService<ExampleEntity, String> {
+    // 空实现即可，所有 CRUD 功能已通过父类提供
+    // 包括：save, insert, updateById, deleteById, findById, createQuery 等
+    //
+    // 只有在用户明确要求时才添加自定义方法
+}
+```
+
+### Controller 层标准模板（推荐）
+
+```java
+package org.jetlinks.pro.example.web;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.hswebframework.web.authorization.annotation.Resource;
+import org.jetlinks.pro.assets.annotation.AssetsController;
+import org.jetlinks.pro.assets.crud.BlockingAssetsHolderCrudController; // 或 AssetsHolderCrudController
+import org.jetlinks.pro.example.entity.ExampleEntity;
+import org.jetlinks.pro.example.service.ExampleService;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 示例控制器
+ *
+ * @author JetLinks
+ * @since 2.11.0
+ */
+@RestController
+@RequestMapping("/example")
+@AllArgsConstructor
+@Getter
+@Slf4j
+@Resource(id = "example", name = "示例管理")
+@Tag(name = "示例管理")
+@AssetsController(type = "example")
+public class ExampleController implements BlockingAssetsHolderCrudController<ExampleEntity, String> {
+
+    private final ExampleService service;
+
+    // 空实现即可，所有标准 CRUD 接口已通过接口提供
+    // 包括：GET /{id}, POST /_query, POST /, PUT /{id}, DELETE /{id} 等
+    //
+    // 只有在用户明确要求时才添加自定义接口
+}
+```
+
+**记住：简洁就是美！让框架为你做事！**
 

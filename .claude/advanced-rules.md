@@ -135,7 +135,6 @@ grep -r "implements.*CommandHandler" modules/
 ```java
 // 实体类
 @Table(name = "table_name")
-@Comment("表注释")
 @EnableEntityEvent
 @Column(length = 32)
 

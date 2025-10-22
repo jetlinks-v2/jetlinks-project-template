@@ -80,4 +80,11 @@ springdoc:
         enabled: false # api gateway 不处理swagger,由ui-service处理.
 trace:
     enabled: true
-    service-name: ${spring.application.name}:${server.port}
+    otlp:
+        enabled: false
+        endpoint: "http://127.0.0.1:4317"
+    local-store:
+        enabled: true
+        max-store-time: 30m
+        max-store-size: 1000000
+        error-only: false
