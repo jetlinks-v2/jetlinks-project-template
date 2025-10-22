@@ -939,7 +939,7 @@ public Flux<Entity> findByNameLike(String name) { ...}
 }
 ```
 
-### 9.3 支持的查询操���符
+### 9.3 支持的查询操作符
 
 | termType   | 说明    | 示例                                                                                       |
 |------------|-------|------------------------------------------------------------------------------------------|
@@ -1289,9 +1289,9 @@ modules/{模块名}/
 - [ ] Controller实现了正确的接口
     - [ ] 响应式: AssetsHolderCrudController
     - [ ] 阻塞式: BlockingAssetsHolderCrudController
-- [ ] Controller创建在api模块中
+- [ ] Controller创建在manager模块的web包中
 - [ ] Controller调用manager模块的Service
-- [ ] Controller返回VO对象而不是Entity对象
+- [ ] Controller返回类型按需选择：默认返回Entity（复用内置CRUD能力），业务需要时可返回VO
 
 #### 通用检查项
 

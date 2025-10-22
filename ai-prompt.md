@@ -469,6 +469,12 @@ CRUD 进阶使用决策流程：
    - FastBeanCopier 完整包名：org.hswebframework.web.bean.FastBeanCopier
    - 不要使用错误的包名如：org.jetlinks.pro.fastjson.FastBeanCopier
    
+   ⚠️ 依赖最小化原则：
+   - 代码注释中引用的类不代表本类需要依赖该类
+   - 只 import 实际使用的类，不要因注释引用而引入不必要的依赖
+   - Consumer 端命令调用：参考 cross-service-call-rules.md 第一章
+   - Provider 端命令定义：参考 cross-service-call-rules.md 第二章
+   
    ✅ 必须：在生成代码前，搜索现有代码验证导入语句
    ✅ 必须：使用项目中实际使用的注解和包名
    ```
