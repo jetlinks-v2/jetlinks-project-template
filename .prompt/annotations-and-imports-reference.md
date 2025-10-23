@@ -18,7 +18,7 @@ import javax.persistence.Table;
 #### @Table
 - **包名**: `javax.persistence.Table`
 - **用途**: 指定数据库表名
-- **示例**: 
+- **示例**:
   ```java
   @Table(name = "cloud_patrol_category_point")
   public class CategoryPointEntity extends GenericEntity<String> {
@@ -44,7 +44,6 @@ import javax.persistence.Table;
 
 ```java
 import org.hswebframework.web.crud.annotation.EnableEntityEvent;
-import org.hswebframework.ezorm.rdb.mapping.annotation.Comment;
 import org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType;
 import org.hswebframework.ezorm.rdb.mapping.annotation.DefaultValue;
 import org.hswebframework.ezorm.rdb.mapping.annotation.GeneratedValue;
@@ -82,11 +81,11 @@ import org.hswebframework.ezorm.rdb.mapping.annotation.EnumCodec;
   @ColumnType(javaType = String.class)
   @EnumCodec
   private StatusEnum status;
-  
+
   // 大文本字段
   @ColumnType(jdbcType = JDBCType.CLOB)
   private String content;
-  
+
   // 多选枚举（位掩码）
   @ColumnType(javaType = Long.class, jdbcType = JDBCType.BIGINT)
   @EnumCodec(toMask = true)
@@ -113,7 +112,7 @@ import org.hswebframework.ezorm.rdb.mapping.annotation.EnumCodec;
   @EnumCodec
   @ColumnType(javaType = String.class)
   private StatusEnum status;
-  
+
   // 多选枚举（位掩码）
   @EnumCodec(toMask = true)
   @ColumnType(javaType = Long.class, jdbcType = JDBCType.BIGINT)
@@ -158,7 +157,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
   ```java
   @Schema(description = "分类名称")
   private String categoryName;
-  
+
   @Schema(description = "创建时间", accessMode = Schema.AccessMode.READ_ONLY)
   private Date createTime;
   ```
@@ -198,14 +197,14 @@ import org.hswebframework.web.bean.FastBeanCopier;
 #### 示例
 ```java
 public class CategoryPointEntity extends GenericEntity<String> {
-    
+
     /**
      * 转换为基础信息VO
      */
     public CategoryPointInfo toInfo() {
         return FastBeanCopier.copy(this, CategoryPointInfo::new);
     }
-    
+
     /**
      * 转换为详细信息VO
      */
@@ -293,9 +292,9 @@ import org.hswebframework.web.authorization.annotation.DeleteAction;
 @AssetsController(type = "cloud-patrol")
 @Authorize
 public class CategoryPointController implements AssetsHolderCrudController<CategoryPointEntity, String> {
-    
+
     private final CategoryPointService service;
-    
+
     // 自动提供标准 CRUD 接口
 }
 ```
@@ -321,9 +320,9 @@ import org.jetlinks.pro.assets.crud.BlockingCorrelatesAssetsHolderCrudController
 @AssetsController(type = "cloud-patrol")
 @Authorize
 public class CategoryPointController implements BlockingAssetsHolderCrudController<CategoryPointEntity, String> {
-    
+
     private final CategoryPointService service;
-    
+
     // 自动提供标准 CRUD 接口
 }
 ```
@@ -396,7 +395,7 @@ import java.util.Date;
 @Table(name = "cloud_patrol_category_point")
 @Comment("分类点位表")
 @EnableEntityEvent
-public class CategoryPointEntity extends GenericEntity<String> 
+public class CategoryPointEntity extends GenericEntity<String>
     implements RecordCreationEntity, RecordModifierEntity {
 
     @Column(length = 1, nullable = false)

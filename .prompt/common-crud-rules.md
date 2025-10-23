@@ -132,7 +132,7 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 
 ### 2.1 基础实体类开发规范
 
-**注意**: 实体类应创建在 **manager模块** 中，不在api模块创建。
+**注意**: 实体类应创建在 **manager模块** ，不在api模块创建。
 
 #### 必需注解和配置
 
@@ -146,6 +146,206 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 - 使用 `@EnumCodec` 处理枚举字段
 - 使用 `@DefaultValue` 设置默认值
 - 使用 `@GeneratedValue` 配置ID生成策略
+
+#### 🔴 统一字段规范（重要！）
+
+当创建的实体字段与JetLinks体系中的标准字段冲突时，**必须以JetLinks规范为准**，使用统一的抽象类和接口。具体字段规范如下：
+
+**基础实体类继承模式**：
+```java
+// ✅ 正确：继承 GenericEntity 并实现 RecordCreationEntity, RecordModifierEntity
+@Getter
+@Setter
+@Table(name = "example")
+@EnableEntityEvent
+public class ExampleEntity extends GenericEntity<String>
+    implements RecordCreationEntity, RecordModifierEntity {
+
+    // 业务字段
+    @Column(length = 128, nullable = false)
+    @Schema(description = "业务名称")
+    private String businessName;
+
+    @Column(length = 512)
+    @Schema(description = "业务描述")
+    private String description;
+
+    // 🔴 重要说明：
+    // - id: 主键ID (已通过GenericEntity提供，无需定义)
+    // - RecordCreationEntity 和 RecordModifierEntity 是接口，需要手动定义相应字段
+    // - creatorId, creatorName, createTime (RecordCreationEntity接口要求，必须定义)
+    // - modifierId, modifierName, modifyTime (RecordModifierEntity接口要求，必须定义)
+
+    // 接口要求的标准字段需要手动定义：
+    @Column(length = 64, updatable = false)
+    @Schema(description = "创建者ID(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+    private String creatorId;
+
+    @Column(updatable = false)
+    @Schema(description = "创建者名称(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+    private String creatorName;
+
+    @Column(updatable = false)
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    @Schema(description = "创建时间(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+    private Long createTime;
+
+    @Column(length = 64)
+    @Schema(description = "修改人ID")
+    private String modifierId;
+
+    @Column(length = 64)
+    @Schema(description = "修改人名称")
+    private String modifierName;
+
+    @Column
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    @Schema(description = "修改时间")
+    private Long modifyTime;
+}
+```
+
+**树形实体类继承模式**：
+```java
+// ✅ 正确：继承 GenericTreeSortSupportEntity 并实现 RecordCreationEntity
+public class ExampleTreeEntity extends GenericTreeSortSupportEntity<String>
+    implements RecordCreationEntity {
+    // 业务字段...
+
+    // 🔴 重要说明：
+    // - id, parentId, path, sortIndex ,level (树形结构字段已在抽象类中定义)
+    // - children: 子节点列表字段需要手动定义（抽象类未提供），不需要@Column注解
+    // - RecordCreationEntity 接口要求：creatorId, creatorName, createTime 必须手动定义
+
+    // 标准字段（RecordCreationEntity接口要求）
+    @Column(length = 64, updatable = false)
+    private String creatorId;
+
+    @Column(length = 128)
+    @Upsert(insertOnly = true)
+    private String creatorName;
+
+    @Column(updatable = false)
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    private Long createTime;
+
+    // 🔴 树形结构补充字段（需要手动定义，不需要注解）
+    private List<ExampleTreeEntity> children;
+}
+```
+
+**标准字段说明**：
+
+| 字段名 | 类型 | 说明 | 归属 |
+|--------|------|------|------|
+| `id` | String | 主键ID | GenericEntity |
+| `creatorId` | String | 创建人ID | RecordCreationEntity |
+| `creatorName` | String | 创建人名称 | RecordCreationEntity |
+| `createTime` | Long | 创建时间（时间戳） | RecordCreationEntity |
+| `modifierId` | String | 修改人ID | RecordModifierEntity |
+| `modifierName` | String | 修改人名称 | RecordModifierEntity |
+| `modifyTime` | Long | 修改时间（时间戳） | RecordModifierEntity |
+| `parentId` | String | 父节点ID | GenericTreeSortSupportEntity |
+| `name` | String | 节点名称 | GenericTreeSortSupportEntity |
+| `path` | String | 节点路径 | GenericTreeSortSupportEntity |
+| `sortIndex` | Integer | 排序索引 | GenericTreeSortSupportEntity |
+| `children` | List<E> | 子节点列表 | GenericTreeSortSupportEntity |
+
+**重要说明**：实现`RecordCreationEntity`和`RecordModifierEntity`接口时，
+**必须在实体类中定义相应的字段**，接口只是规范，不提供字段实现。
+
+**字段配置规范**：
+
+```java
+// 创建人相关字段 (RecordCreationEntity接口要求)
+@Column(length = 64, updatable = false)
+@Schema(description = "创建人ID")
+private String creatorId;
+
+@Column
+@Schema(description = "创建人名称")
+@Upsert(insertOnly = true)  // 只在插入时设置
+private String creatorName;
+
+@Column(updatable = false)
+@DefaultValue(generator = Generators.CURRENT_TIME)
+@Schema(description = "创建时间")
+private Long createTime;
+
+// 修改人相关字段 (RecordModifierEntity接口要求)
+@Column(length = 64)
+@Schema(description = "修改人ID")
+private String modifierId;
+
+@Column
+@Schema(description = "修改人名称")
+private String modifierName;
+
+@Column
+@DefaultValue(generator = Generators.CURRENT_TIME)
+@Schema(description = "修改时间")
+private Long modifyTime;
+```
+
+**❌ 错误示例**：
+```java
+// ❌ 错误：不要重复定义标准字段
+public class ExampleEntity extends GenericEntity<String> {
+    @Column
+    private String id;  // 重复定义，GenericEntity已提供
+
+
+}
+```
+
+**✅ 正确示例**：
+```java
+// ✅ 正确：定义业务字段和标准字段
+@Getter
+@Setter
+@Table(name = "example")
+@EnableEntityEvent
+public class ExampleEntity extends GenericEntity<String>
+    implements RecordCreationEntity, RecordModifierEntity {
+
+    // 业务字段
+    @Column(length = 128, nullable = false)
+    @Schema(description = "业务名称")
+    private String businessName;
+
+    @Column(length = 512)
+    @Schema(description = "业务描述")
+    private String description;
+
+    // 标准字段（接口要求实现）
+    @Column(length = 64, updatable = false)
+    @Schema(description = "创建人ID")
+    private String creatorId;
+
+    @Column(length = 128)
+    @Schema(description = "创建人名称")
+    @Upsert(insertOnly = true)
+    private String creatorName;
+
+    @Column(updatable = false)
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    @Schema(description = "创建时间")
+    private Long createTime;
+
+    @Column(length = 64)
+    @Schema(description = "修改人ID")
+    private String modifierId;
+
+    @Column(length = 128)
+    @Schema(description = "修改人名称")
+    private String modifierName;
+
+    @Column
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    @Schema(description = "修改时间")
+    private Long modifyTime;
+}
+```
 
 #### 字段类型规范
 
@@ -166,10 +366,77 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 
 如果实体需要支持树形结构：
 
-- 继承 `GenericTreeSortSupportEntity<String>`
-- 实现 `RecordCreationEntity` 接口
-- 添加 `children` 字段用于存储子节点
-- 其他字段配置与基础实体类相同
+- 继承 `GenericTreeSortSupportEntity<String>` 或 `ExtendableTreeSortSupportEntity<String>`
+- 实现 `RecordCreationEntity` 接口（通常不需要 `RecordModifierEntity`，因为抽象类已提供）
+- **重要**：不需要手动添加 `children` 字段，抽象类已提供
+- 树形结构相关字段（`parentId`, `path`, `sortIndex`, `name`等）都已在抽象类中定义
+- 其他业务字段配置与基础实体类相同
+
+**树形实体标准示例**：
+```java
+// ✅ 正确：标准树形实体继承模式
+@Table(name = "example_tree")
+@Getter
+@Setter
+@EnableEntityEvent
+public class ExampleTreeEntity extends GenericTreeSortSupportEntity<String>
+    implements RecordCreationEntity {
+
+    // 业务字段
+    @Column(length = 64, nullable = false)
+    @Schema(description = "业务编码")
+    private String code;
+
+    @Column(length = 512)
+    @Schema(description = "业务描述")
+    private String description;
+
+    @Column
+    @JsonCodec
+    @Schema(description = "业务配置")
+    private Map<String, Object> properties;
+
+    // 标准字段（RecordCreationEntity接口要求）
+    @Column(length = 64, updatable = false)
+    @Schema(description = "创建人ID")
+    private String creatorId;
+
+    @Column(length = 128)
+    @Schema(description = "创建人名称")
+    @Upsert(insertOnly = true)
+    private String creatorName;
+
+    @Column(updatable = false)
+    @DefaultValue(generator = Generators.CURRENT_TIME)
+    @Schema(description = "创建时间")
+    private Long createTime;
+
+    // 树形结构字段已通过GenericTreeSortSupportEntity继承获得：
+    // - id: 主键ID
+    // - parentId: 父节点ID
+    // - path: 节点路径
+    // - sortIndex: 排序索引
+
+    // 子节点属性,无需定义Column,仅用于数据传输使用
+    private List<ExampleTreeEntity> children;
+}
+```
+
+**❌ 错误示例**：
+```java
+// ❌ 错误：不要重复定义树形结构字段
+public class ExampleTreeEntity extends GenericTreeSortSupportEntity<String> {
+    @Column
+    private String parentId;  // 重复定义，抽象类已提供
+
+    @Column
+    private String name;      // 重复定义，抽象类已提供
+
+    @Column
+    private Integer sortIndex; // 重复定义，抽象类已提供
+
+}
+```
 
 ### 2.3 枚举类型规范
 
@@ -199,17 +466,251 @@ Manager模块 (manager) - 包含Entity、Service、Controller
     - `updatable`: 是否可更新(默认true)
     - `nullable`: 是否允许为空(默认true)
 - `@ColumnType`: 指定JDBC类型和Java类型 - **使用 `org.hswebframework.ezorm.rdb.mapping.annotation.ColumnType`**
-- `@JsonCodec`: 自动将Java对象序列化为JSON存储
-- `@EnumCodec`: 枚举类型编解码
+- `@JsonCodec`: 自动将Java对象序列化为JSON存储 - **使用 `org.hswebframework.ezorm.rdb.mapping.annotation.JsonCodec`**
+- `@EnumCodec`: 枚举类型编解码 - **使用 `org.hswebframework.ezorm.rdb.mapping.annotation.EnumCodec`**
     - `toMask = true`: 使用位掩码存储多个枚举值(用于数组)
-- `@DefaultValue`: 设置默认值
+- `@DefaultValue`: 设置默认值 - **使用 `org.hswebframework.ezorm.rdb.mapping.annotation.DefaultValue`**
     - `generator`: 使用生成器(如 `Generators.CURRENT_TIME`)
-- `@GeneratedValue`: ID生成策略
-    - `generator = Generators.SNOW_FLAKE`: 雪花算法
-    - `generator = Generators.UUID`: UUID
 - `@Schema`: Swagger文档注解
     - `description`: 字段描述
     - `accessMode`: 访问模式(READ_ONLY/READ_WRITE等)
+
+### 2.5 🔴 @Column 定义规范（重要！）
+
+#### 字段约束配置要求
+
+**每个字段都应该有明确的约束配置**，AI在生成实体类时必须仔细审查并设置合适的@Column注解配置。
+
+#### 🔴 字段长度规范（重要！）
+
+| 字段类型 | 默认长度 | 说明 |
+|----------|----------|------|
+| **所有字符串ID字段** | **64** | creatorId, modifierId, userId, deviceId, productId等 |
+| **名称字段** | 128 | name, title, displayName等 |
+| **描述字段** | 512 | description, remark等 |
+| **编码字段** | 64 | code, type, status等 |
+| **大文本字段** | 不限制 | 使用 CLOB 类型 |
+| **标识字段** | 32 | 短标识，如 category, level等 |
+
+#### 基本字段约束模板
+
+| 字段类型 | 必填字段配置 | 可选字段配置 | 说明 |
+|----------|--------------|--------------|------|
+| `String` | `length` + `nullable = false` | `length` | 文本字段必须指定长度 |
+| `Integer` | `nullable = false` | - | 数值字段 |
+| `Long` | `nullable = false` | - | 长整数字段 |
+| `Boolean` | `nullable = false` | - | 布尔字段 |
+| `LocalDateTime` | `nullable = false` | - | 日期时间字段 |
+| `Map<String,Object>` | `@JsonCodec` | `@JsonCodec` | JSON对象字段 |
+
+#### 🔴 标准字段约束模板
+
+根据实际JetLinks项目代码分析，标准字段约束模式如下：
+
+```java
+// 🔴 创建人相关字段（不可更新）
+@Column(length = 64, updatable = false)
+@Schema(description = "创建者ID(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+private String creatorId;
+
+@Column(updatable = false)
+@Schema(description = "创建者名称(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+private String creatorName;
+
+@Column(updatable = false)
+@DefaultValue(generator = Generators.CURRENT_TIME)
+@Schema(description = "创建时间(只读)", accessMode = Schema.AccessMode.READ_ONLY)
+private Long createTime;
+
+// 🔴 修改人相关字段（可更新）
+@Column(length = 64)
+@Schema(description = "修改人ID")
+private String modifierId;
+
+@Column(length = 64)
+@Schema(description = "修改人名称")
+private String modifierName;
+
+@Column
+@DefaultValue(generator = Generators.CURRENT_TIME)
+@Schema(description = "修改时间")
+private Long modifyTime;
+```
+
+#### 业务字段约束模板
+
+```java
+// 🔴 必填文本字段
+@Column(length = 128, nullable = false)
+@Schema(description = "业务名称")
+@NotBlank // 使用jsr303校验
+private String businessName;
+
+// 🔴 可选文本字段
+@Column(length = 512)
+@Schema(description = "业务描述")
+private String businessDescription;
+
+// 🔴 ID字段（关联其他实体）
+@Column(length = 64, nullable = false)
+@Schema(description = "关联设备ID")
+@NotBlank
+private String deviceId;
+
+// 🔴 枚举字段
+@Column(length = 32, nullable = false)
+@EnumCodec
+@ColumnType(javaType = String.class)
+@Schema(description = "业务状态")
+private BusinessStatus status;
+
+// 🔴 数值字段
+@Column(nullable = false)
+@Schema(description = "排序索引")
+private Integer sortIndex;
+
+// 🔴 布尔字段
+@Column
+@Schema(description = "是否启用")
+private Boolean enabled;
+
+// 🔴 JSON字段
+@Column
+@JsonCodec
+@Schema(description = "扩展配置")
+private Map<String, Object> properties;
+```
+
+#### 特殊约束配置
+
+```java
+@Column(length = 64, nullable = false)
+@Schema(description = "业务编码")
+private String businessCode;
+
+// 🔴 大文本字段
+@Column
+@ColumnType(jdbcType = JDBCType.LONGVARCHAR)
+@Schema(description = "详细内容")
+private String content;
+
+// 🔴 时间戳字段（自动更新）
+@Column
+@DefaultValue(generator = Generators.CURRENT_TIME)
+@Schema(description = "创建时间")
+private Long createTime;
+
+// 🔴 定长字段
+@Column(length = 32)
+@Schema(description = "分类标识")
+private String category;
+```
+
+#### 🔴 AI 审查清单
+
+在生成实体类时，AI必须按以下顺序审查每个字段：
+
+1. **字段类型分析**
+   - 字段是什么类型？
+   - 是否为ID字段（必须长度64）？
+   - 是否为必填字段？
+   - 是否有特殊业务需求？
+
+2. **约束配置审查**
+   - `String` 类型：是否设置了 `length`？
+   - **ID字段**：是否设置 `length = 64`？
+   - **名称字段**：是否设置合适的长度（通常128）？
+   - **描述字段**：是否设置合适的长度（通常512）？
+   - 必填字段：是否设置了 `nullable = false`？
+   - 创建时间字段：是否设置了 `updatable = false`？
+   - JSON字段：是否添加了 `@JsonCodec`？
+   - 枚举字段：是否添加了 `@EnumCodec` 和 `@ColumnType`？
+
+3. **注解完整性**
+   - 是否有 `@Column` 注解？
+   - 是否有 `@Schema` 注解？
+   - 是否有相关的编解码注解？
+
+4. **业务逻辑检查**
+   - 字段配置是否符合业务需求？
+   - 约束是否合理？
+   - 是否遗漏了必要的配置？
+
+#### ❌ 错误示例
+
+```java
+// ❌ 错误：缺少长度约束
+@Column
+private String name;  // String字段必须指定length
+
+// ❌ 错误：ID字段长度错误
+@Column(length = 32)
+private String deviceId;  // ID字段应该使用长度64
+
+// ❌ 错误：必填字段未设置约束
+@Column
+private String requiredField;  // 应该设置 nullable = false
+
+// ❌ 错误：JSON字段缺少编解码
+@Column
+private Map<String, Object> config;  // 应该添加 @JsonCodec
+
+// ❌ 错误：枚举字段缺少编解码
+@Column
+private StatusEnum status;  // 应该添加 @EnumCodec 和 @ColumnType
+```
+
+#### ✅ 正确示例
+
+```java
+import java.sql.JDBCType;
+
+// ✅ 正确：完整的字段约束配置
+@Getter
+@Setter
+@Table(name = "example")
+@EnableEntityEvent
+public class ExampleEntity extends GenericEntity<String>
+    implements RecordCreationEntity, RecordModifierEntity {
+
+    // 必填文本字段
+    @Column(length = 128, nullable = false)
+    @Schema(description = "业务名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String businessName;
+
+    // 可选文本字段
+    @Column(length = 512)
+    @Schema(description = "业务描述")
+    private String businessDescription;
+
+    // ID关联字段
+    @Column(length = 64, nullable = false)
+    @Schema(description = "关联设备ID")
+    private String deviceId;
+
+    // 枚举字段
+    @Column(length = 32, nullable = false)
+    @EnumCodec
+    @ColumnType(javaType = String.class)
+    @Schema(description = "业务状态")
+    private BusinessStatus status;
+
+    // JSON字段
+    @Column
+    @JsonCodec
+    //JsonCodec需配合ColumnType
+    @ColumnType(jdbcType = JDBCType.LONGVARCHAR,javaType=String.class)
+    @Schema(description = "扩展配置")
+    private Map<String, Object> properties;
+
+    // 标准字段（接口要求实现）
+    @Column(length = 64, updatable = false)
+    @Schema(description = "创建人ID")
+    private String creatorId;
+
+    // ... 其他字段
+}
+```
 
 ---
 
@@ -223,14 +724,12 @@ Manager模块 (manager) - 包含Entity、Service、Controller
 
 - 添加 `@Getter` 和 `@Setter` 注解
 - 添加 `@Schema(description = "描述")` 注解
-- 使用 `@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")` 格式化日期时间
 - 不包含JPA相关注解
 
 #### 常用字段类型
 
 - **基础字段**: String、Integer、Long、Boolean等
-- **时间字段**: 使用 `LocalDateTime` + `@JsonFormat`
-- **JSON字段**: 使用 `Map<String, Object>`
+- **时间字段**: 使用 `Long` 表示时间戳.
 - **关联字段**: 添加关联对象的ID和名称字段
 
 ### 3.2 详情VO类规范
@@ -596,10 +1095,10 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
    用户可以通过 `POST /_query` 接口实现各种查询：
    ```json
    {
-     "where": [
-       {"column": "categoryId", "value": 1},
-       {"column": "pointName", "value": "test", "termType": "like"}
-     ],
+     "filter": {
+      "categoryId": "123",
+      "code$gt": 10
+     },
      "pageIndex": 0,
      "pageSize": 20
    }
@@ -613,7 +1112,6 @@ public class ExampleController implements ReactiveServiceCrudController<ExampleE
 
 - 使用 `@GetMapping("/_tree")` 映射树形查询接口
 - 使用 `TreeSupportEntity.list2tree()` 构建树形结构
-- 使用 `@Authorize(merge = false)` 不合并权限检查
 
 ### 5.3 关联资产权限控制规范
 
@@ -905,7 +1403,7 @@ public Flux<Entity> findByNameLike(String name) { ...}
 
 ```json
 {
-    "where": [
+    "terms": [
         {
             "column": "type",
             "value": 1
@@ -962,10 +1460,10 @@ public Flux<Entity> findByNameLike(String name) { ...}
 
 ```json
 {
-    "where": [
+    "terms": [
         {
             "type": "and",
-            "children": [
+            "terms": [
                 {
                     "column": "type",
                     "value": 1
@@ -978,7 +1476,7 @@ public Flux<Entity> findByNameLike(String name) { ...}
         },
         {
             "type": "or",
-            "children": [
+            "terms": [
                 {
                     "column": "priority",
                     "value": "high"
@@ -997,17 +1495,17 @@ public Flux<Entity> findByNameLike(String name) { ...}
 
 ```json
 {
-    "where": [
+    "terms": [
         {
             "type": "and",
-            "children": [
+            "terms": [
                 {
                     "column": "projectId",
                     "value": "proj123"
                 },
                 {
                     "type": "or",
-                    "children": [
+                    "terms": [
                         {
                             "column": "type",
                             "value": 1
