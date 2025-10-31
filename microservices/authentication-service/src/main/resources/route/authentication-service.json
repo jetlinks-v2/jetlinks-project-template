@@ -38,5 +38,10 @@
         "path": "/doc.html",
         "authorize": false,
         "order": -1
+    },
+    {
+        "path": "/webjars/**",
+        "authorize": false,
+        "order": -1
     }
 ]

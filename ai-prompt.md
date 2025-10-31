@@ -25,6 +25,7 @@
 1. **首先判断任务类型**：
     - **不知道有哪些模块** → 先查看 [module-list](.prompt/module-list.md)
     - **不确定注解和包名** → 先查看 [annotations-and-imports-reference](.prompt/annotations-and-imports-reference.md)
+    - **配置国际化** → 先查看 [i18n](.prompt/i18n.md)
     - 创建新模块 → 使用 [module-creation-rules](.prompt/module-creation-rules.md)
     - 在现有模块中添加基础 CRUD 功能 → 使用 [common-crud-rules](.prompt/common-crud-rules.md)
     - **CRUD 进阶使用**（事件驱动、复杂查询、编程模式选择） → 使用 [advanced-crud-rules](.prompt/advanced-crud-rules.md)
@@ -84,6 +85,70 @@
 用户说："如何引入XXX模块？"
 用户说："XXX功能在哪个模块？"
 AI说："让我先查看模块列表，确认有哪些可用模块"
+```
+
+---
+
+### 0.1 国际化配置规范 - [i18n](.prompt/i18n.md)
+
+**用途**: 完整的 JetLinks 国际化(i18n)配置规范和开发指南
+
+**包含内容**:
+
+- ✅ 国际化文件位置和命名规范
+- ✅ 枚举类国际化配置（完整包名.枚举类名.枚举值）
+- ✅ 实体类字段国际化配置（完整包名.实体类名.字段名）
+- ✅ **功能权限国际化**（hswebframework.web.system.permission.{权限ID}）
+- ✅ **按钮操作国际化**（hswebframework.web.system.action.{操作ID}）
+- ✅ 错误消息和提示消息国际化
+- ✅ 完整的配置示例和快速参考表
+- ✅ AI 代码生成时的国际化规范
+
+**适用场景**:
+
+- ✨ 创建或修改实体类时需要配置国际化
+- ✨ 创建枚举类时需要配置枚举值显示名称
+- ✨ 创建 Controller 时需要配置功能权限和操作按钮的国际化
+- ✨ 不确定国际化配置的格式和规范
+- ✨ 需要了解权限和操作的国际化前缀
+
+**何时使用**:
+
+```
+用户说："添加国际化配置"
+用户说："配置枚举的显示名称"
+用户说："如何配置功能权限的国际化？"
+用户说："按钮操作的国际化怎么写？"
+用户说："创建 Controller 需要配置什么国际化？"
+AI说："让我先查看国际化规范，了解正确的配置格式"
+```
+
+**核心规范**:
+
+```properties
+# 1. 枚举国际化
+完整包名.枚举类名.枚举值=显示名称
+org.jetlinks.pro.device.enums.DeviceState.online=在线
+
+# 2. 实体字段国际化
+完整包名.实体类名.字段名=显示名称
+org.jetlinks.pro.device.entity.DeviceInstanceEntity.productName=产品名称
+
+# 3. 功能权限国际化（必须配置，对应 @Resource 的 id）
+hswebframework.web.system.permission.{权限ID}=权限名称
+hswebframework.web.system.permission.device-product=设备产品
+
+# 4. 按钮操作国际化
+hswebframework.web.system.action.{操作ID}=操作名称
+hswebframework.web.system.action.query=查询
+
+# 5. 错误消息
+error.标识=错误消息
+error.device_not_found=设备[{0}]不存在
+
+# 6. 提示消息
+message.标识=提示消息
+message.operation_success=操作成功
 ```
 
 ---
@@ -527,6 +592,7 @@ CRUD 进阶使用决策流程：
 │  2. 判断任务类型                                  │
 │     ├─ 创建新模块？→ module-creation-rules      │
 │     ├─ 添加CRUD？  → common-crud-rules          │
+│     ├─ 配置国际化？→ i18n                       │
 │     ├─ 跨服务调用？→ cross-service-call-rules   │
 │     ├─ 订阅消息？  → realtime-subscription-rules│
 │     ├─ 监听事件？  → event-driven-rules         │
@@ -569,7 +635,16 @@ CRUD 进阶使用决策流程：
                   │
                   ▼
 ┌─────────────────────────────────────────────────┐
-│  7. 验证和检查                                    │
+│  7. 配置国际化（如果涉及）                        │
+│     - 创建枚举类：配置枚举值国际化                │
+│     - 创建实体类：配置字段国际化（可选）          │
+│     - 创建Controller：配置功能权限和操作国际化    │
+│     - 参考 i18n.md 规范                          │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│  8. 验证和检查                                    │
 │     - 使用检查清单验证                            │
 │     - 确保所有注解完整                            │
 │     - 说明代码参考了哪个现有实现                  │
@@ -589,6 +664,14 @@ CRUD 进阶使用决策流程：
     │       ├─ 快速查找模块
     │       ├─ 复制 Maven 配置
     │       └─→ 了解模块基本功能
+    │
+    ├─ "添加国际化配置" / "配置枚举/字段显示名称" / "功能权限国际化"
+    │   └─→ 查看 i18n
+    │       ├─ 枚举国际化：包名.枚举类名.枚举值=显示名称
+    │       ├─ 实体字段国际化：包名.实体类名.字段名=显示名称
+    │       ├─ 功能权限：hswebframework.web.system.permission.{权限ID}=名称
+    │       ├─ 按钮操作：hswebframework.web.system.action.{操作ID}=名称
+    │       └─→ 查看完整配置示例和规范
     │
     ├─ "创建一个XXX管理模块"
     │   │
@@ -856,6 +939,7 @@ CRUD 进阶使用决策流程：
 | 需求              | 规则文件                     | 章节    | 搜索建议 |
 |-----------------|--------------------------|-------|---------|
 | **查看所有模块**    | **module-list** | **全文** | 快速检索所有可用模块 |
+| **国际化配置规范**    | **i18n** | **全文** | 枚举、实体、权限、操作的国际化配置 |
 | Maven pom.xml   | module-creation-rules    | 2.2   | 查看现有模块的 pom.xml |
 | Configuration 类 | module-creation-rules    | 2.4   | `grep -r "Configuration.java" modules/` |
 | 基础实体类           | common-crud-rules        | 1.1   | `grep -r "@Table" modules/` |
@@ -865,6 +949,9 @@ CRUD 进阶使用决策流程：
 | 阻塞式控制器          | common-crud-rules        | 3.A.1 | `grep -r "BlockingAssetsHolderCrudController" modules/` |
 | 资产类型定义          | module-creation-rules    | 2.9   | `grep -r "AssetType" modules/` |
 | 权限控制            | common-crud-rules        | 4     | `grep -r "@Authorize" modules/` |
+| **枚举国际化**        | **i18n** | **1** | `grep -r "org.jetlinks.*enums.*=" modules/` |
+| **功能权限国际化**    | **i18n** | **5.1** | `grep -r "hswebframework.web.system.permission" modules/` |
+| **按钮操作国际化**    | **i18n** | **5.2** | `grep -r "hswebframework.web.system.action" modules/` |
 | **模块列表查询**      | **module-reference** | **一** | 查看各模块的功能说明 |
 | **模块引入决策**      | **module-reference** | **二.1** | 何时添加 Maven 依赖 |
 | **跨服务调用决策**    | **module-reference** | **二.2** | 何时使用命令模式 |
