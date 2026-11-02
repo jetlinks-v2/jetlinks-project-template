@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jetlinks-project-template</artifactId>
         <groupId>org.jetlinks.pro</groupId>
-        <version>2.11.0-SNAPSHOT</version>
+        <version>2.20.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -50,6 +50,27 @@
         </plugins>
     </build>
 
+    <profiles>
+        <!-- 属性激活避免切换数据库或存储 profile 时意外关闭 SaaS；-Dsaas.enabled=false 可关闭。 -->
+        <profile>
+            <id>saas</id>
+            <activation>
+                <property>
+                    <name>saas.enabled</name>
+                    <value>!false</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>saas-runtime-component</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
+
     <dependencies>
         <!-- !!这个依赖必须放在最前面!! -->
         <dependency>
@@ -76,7 +97,7 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-autoconfigure</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jetlinks-project-template</artifactId>
         <groupId>org.jetlinks.pro</groupId>
-        <version>2.11.0-SNAPSHOT</version>
+        <version>2.20.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -51,15 +51,36 @@
     </build>
 
     <profiles>
+        <!-- 属性激活避免切换数据库或存储 profile 时意外关闭 SaaS；-Dsaas.enabled=false 可关闭。 -->
+        <profile>
+            <id>saas</id>
+            <activation>
+                <property>
+                    <name>saas.enabled</name>
+                    <value>!false</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-rule-engine</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
 
         <profile>
             <id>es7x</id>
             <properties>
-                <elasticsearch.version>7.17.26</elasticsearch.version>
+                <elasticsearch.version>${elasticsearch7x.version}</elasticsearch.version>
             </properties>
 
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>elasticsearch.major</name>
+                    <value>!8</value>
+                </property>
             </activation>
             <dependencies>
 
@@ -85,6 +106,12 @@
 
         <profile>
             <id>es8x</id>
+            <activation>
+                <property>
+                    <name>elasticsearch.major</name>
+                    <value>8</value>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.jetlinks.pro</groupId>
@@ -105,13 +132,13 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-dependencies</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-autoconfigure</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>

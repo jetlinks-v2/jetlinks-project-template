@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.jetlinks.pro</groupId>
         <artifactId>jetlinks-project-template</artifactId>
-        <version>2.11.0-SNAPSHOT</version>
+        <version>2.20.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -16,18 +16,80 @@
 
     <artifactId>bootstrap</artifactId>
 
-    <properties>
-        <jetlinks.ui.version>2.10.0-SNAPSHOT</jetlinks.ui.version>
-    </properties>
-
     <profiles>
+        <!-- 属性激活避免切换数据库或存储 profile 时意外关闭 SaaS；-Dsaas.enabled=false 可关闭。 -->
+        <profile>
+            <id>saas</id>
+            <activation>
+                <property>
+                    <name>saas.enabled</name>
+                    <value>!false</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>saas-runtime-component</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>saas-runtime-auth</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>saas-runtime-agent</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>saas-runtime-device</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-domain</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-device</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-notify</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-rule-engine</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jetlinks.pro</groupId>
+                    <artifactId>tenant-visualization</artifactId>
+                    <version>${jetlinks.pro.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
         <profile>
             <id>cassandra</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jetlinks.pro</groupId>
                     <artifactId>cassandra-component</artifactId>
-                    <version>${project.version}</version>
+                    <version>${jetlinks.pro.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -59,7 +121,6 @@
                 <dependency>
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>mssql-jdbc</artifactId>
-                    <version>8.2.2.jre8</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -135,11 +196,14 @@
         <profile>
             <id>es7x</id>
             <properties>
-                <elasticsearch.version>7.17.26</elasticsearch.version>
+                <elasticsearch.version>${elasticsearch7x.version}</elasticsearch.version>
             </properties>
 
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>elasticsearch.major</name>
+                    <value>!8</value>
+                </property>
             </activation>
             <dependencies>
 
@@ -165,6 +229,12 @@
 
         <profile>
             <id>es8x</id>
+            <activation>
+                <property>
+                    <name>elasticsearch.major</name>
+                    <value>8</value>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.jetlinks.pro</groupId>
@@ -188,7 +258,7 @@
                 <dependency>
                     <groupId>org.jetlinks.ui</groupId>
                     <artifactId>jetlinks-ui-resource</artifactId>
-                    <version>${jetlinks.ui.version}</version>
+                    <version>${jetlinks.ui.resource.version}</version>
                 </dependency>
 
                 <dependency>
@@ -200,7 +270,7 @@
                 <dependency>
                     <groupId>org.jetlinks.ui</groupId>
                     <artifactId>datasource-manager</artifactId>
-                    <version>${jetlinks.ui.version}</version>
+                    <version>${jetlinks.ui.datasource.version}</version>
                 </dependency>
 
                 <dependency>
@@ -224,7 +294,7 @@
                 <dependency>
                     <groupId>org.jetlinks.ui</groupId>
                     <artifactId>visualization-manager</artifactId>
-                    <version>${jetlinks.ui.version}</version>
+                    <version>${jetlinks.ui.visualization.version}</version>
                 </dependency>
 
                 <dependency>
@@ -317,7 +387,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
                 <executions>
                     <execution>
                         <id>report-aggregate</id>
@@ -342,19 +411,19 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>datasource-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>kafka-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>rabbitmq-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
@@ -368,81 +437,81 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.jetlinks.pro</groupId>
             <artifactId>dashboard-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.jetlinks.pro</groupId>
             <artifactId>gateway-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>protocol-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>rule-engine-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>logging-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>authentication-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>network-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>device-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>geo-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>notify-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>notify-dingtalk</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>notify-wechat</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>notify-webhook</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
@@ -545,7 +614,7 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>tdengine-component</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
@@ -556,19 +625,19 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>jetlinks-function</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>visualization-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>media-manager</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>

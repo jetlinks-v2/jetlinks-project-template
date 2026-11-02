@@ -5,7 +5,7 @@
 
     <groupId>org.jetlinks.pro</groupId>
     <artifactId>jetlinks-project-template</artifactId>
-    <version>2.11.0-SNAPSHOT</version>
+    <version>2.20.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>JetLinks 项目模版</name>
@@ -15,8 +15,14 @@
         <project.build.locales>zh_CN</project.build.locales>
         <java.version>17</java.version>
         <project.build.jdk>${java.version}</project.build.jdk>
-        <jetlinks.pro.version>2.11.0-SNAPSHOT</jetlinks.pro.version>
-        <spring.boot.version>3.4.11</spring.boot.version>
+        <jetlinks.pro.version>2.20.0-SNAPSHOT</jetlinks.pro.version>
+        <spring.boot.version>3.4.13</spring.boot.version>
+        <elasticsearch7x.version>7.17.29</elasticsearch7x.version>
+        <!-- UI 资源独立发布，版本以私服中实际可用的制品为准。 -->
+        <jetlinks.ui.version>2.11.0-SNAPSHOT</jetlinks.ui.version>
+        <jetlinks.ui.resource.version>2.12.0-SNAPSHOT</jetlinks.ui.resource.version>
+        <jetlinks.ui.datasource.version>2.12.0-SNAPSHOT</jetlinks.ui.datasource.version>
+        <jetlinks.ui.visualization.version>2.12.0-SNAPSHOT</jetlinks.ui.visualization.version>
     </properties>
 
     <build>
@@ -30,6 +36,12 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.3</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>

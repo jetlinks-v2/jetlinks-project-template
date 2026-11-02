@@ -1,6 +1,6 @@
 ---
+description: JetLinks 脚手架统一开发规则
 alwaysApply: true
 ---
 
-1. 请使用中文进行交互
-2. 开发相关问题请阅读: ../../ai-prompt.md 作为提示词.
+请使用中文交互。开发前阅读仓库根 [AGENTS.md](../../AGENTS.md)，按任务使用已安装的共享 JetLinks skills。`ai-prompt.md` 仅作兼容入口，不在 Cursor 规则中维护重复的开发规范。

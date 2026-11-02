@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jetlinks-project-template</artifactId>
         <groupId>org.jetlinks.pro</groupId>
-        <version>2.11.0-SNAPSHOT</version>
+        <version>2.20.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -48,10 +48,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <jetlinks.ui.version>2.10.0-SNAPSHOT</jetlinks.ui.version>
-    </properties>
 
     <profiles>
         <profile>
@@ -137,7 +133,7 @@
         <dependency>
             <groupId>org.jetlinks.ui</groupId>
             <artifactId>jetlinks-ui-resource</artifactId>
-            <version>${jetlinks.ui.version}</version>
+            <version>${jetlinks.ui.resource.version}</version>
         </dependency>
 
         <!-- 数采 -->
@@ -151,7 +147,7 @@
         <dependency>
             <groupId>org.jetlinks.ui</groupId>
             <artifactId>datasource-manager</artifactId>
-            <version>${jetlinks.ui.version}</version>
+            <version>${jetlinks.ui.datasource.version}</version>
         </dependency>
 
         <!-- 设备管理 -->
@@ -190,7 +186,7 @@
         <dependency>
             <groupId>org.jetlinks.ui</groupId>
             <artifactId>visualization-manager</artifactId>
-            <version>${jetlinks.ui.version}</version>
+            <version>${jetlinks.ui.visualization.version}</version>
         </dependency>
 
 
@@ -217,7 +213,7 @@
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
             <artifactId>microservice-autoconfigure</artifactId>
-            <version>${project.version}</version>
+            <version>${jetlinks.pro.version}</version>
         </dependency>
 
         <dependency>

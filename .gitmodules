@@ -1,0 +1,4 @@
+[submodule "runtime-ui"]
+	path = runtime-ui
+	url = git@github.com:jetlinks-v2/saas-runtime-ui.git
+	branch = 2.20
