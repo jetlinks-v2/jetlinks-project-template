@@ -7,9 +7,9 @@
 ```text
 jetlinks-project-template
 ├── bootstrap                         平台单体启动参考
-├── runtime-ui                        脚手架自有的运行时前端工作区
-│   ├── jetlinks-web-core             前端壳（Git 子模块，2.20 分支）
-│   └── modules                       SaaS 基础扩展及应用自己的 UI 模块
+├── saas-runtime-ui                   完整运行时前端（Git 子模块，2.20 分支）
+│   ├── jetlinks-web-core             平台前端壳（嵌套 Git 子模块）
+│   └── modules                       SaaS 扩展及标准业务 UI
 ├── microservices                     平台微服务启动参考
 │   ├── api-gateway-service           API 网关
 │   ├── authentication-service        认证服务
@@ -42,42 +42,35 @@ git remote add origin {项目远程仓库地址}
 
 ### 初始化与开发前端
 
-`runtime-ui/` 是脚手架自有的 pnpm 工作区，包含初始化配置与 SaaS 运行时扩展。下列基础能力通过 Git 子模块引入并锁定 `2.20` 提交，其余标准业务 UI 按需添加：
-
-| 子模块 | 职责 |
-| --- | --- |
-| `jetlinks-web-core` | 登录、账户、路由、菜单、权限与公共组件 |
-| `modules/authentication-manager-ui` | SaaS 扩展依赖的认证与权限管理 UI |
-| `modules/device-manager-ui` | SaaS 扩展依赖的设备与产品 UI |
-| `modules/rule-engine-manager-ui` | 规则引擎 UI |
-| `modules/edge-master-ui` | 边缘网关 UI |
-
-SaaS 扩展来自上游 `modules/saas-runtime-ui/` 源码目录，由当前仓库直接管理，来源见 [UPSTREAM.md](runtime-ui/modules/saas-runtime-ui/UPSTREAM.md)。工作区按平台统一的前端模块结构初始化，标准能力通过各自子模块复用。使用普通 clone、GitHub 模板或压缩包创建项目后，需确认子模块源码完整：
+`saas-runtime-ui/` 直接通过 Git 子模块复用完整的 [SaaS 运行时前端仓库](https://github.com/jetlinks-v2/saas-runtime-ui)，跟踪 `2.20` 分支并锁定提交。前端壳、SaaS 扩展、认证、设备、规则引擎、边缘网关等能力及其依赖和构建配置统一由该仓库维护。其内部标准 UI 仍通过嵌套子模块引入，应递归初始化：
 
 ```bash
 # 已克隆仓库时，在项目根目录递归初始化；压缩包不包含子模块源码，应改用 Git 克隆
 git submodule sync --recursive
 git submodule update --init --recursive
 
-# Node.js >= 22.18.0，并使用 package.json 中声明的 pnpm 版本
-cd runtime-ui
+# Node.js >= 22.18.0，pnpm >= 10
+cd saas-runtime-ui
 pnpm install
 pnpm dev
 
 # 开发时指定实际后端网关
 pnpm dev:proxy http://localhost:8844
 
-# 生产构建及类型检查
+# 生产构建
 pnpm build
-pnpm typecheck
+
+# 不使用 SaaS 项目环境时，使用上游提供的独立模式
+pnpm dev:standalone
+pnpm build:standalone
 
 # 仅构建指定业务模块，将 my-business-ui 替换为实际模块名称
 pnpm build:modules my-business-ui
 ```
 
-在 `runtime-ui/.env` 中设置 `VITE_APP_PROJECT_CODE` 项目标识、`VITE_APP_NAME` 存储命名空间、`VITE_APP_DEV_PROXY_URL` 后端网关与 `VITE_PUBLIC_PATH` 部署基础路径。开发端口默认 `9100`，生产构建产物位于 `runtime-ui/dist/`，可独立部署。默认启用 SaaS 项目运行环境；独立部署时将 `VITE_APP_ENVIRONMENT` 设为空。前端运行环境与后端 Maven 的 `saas.enabled` 依赖开关分别配置。
+前端环境配置位于 `saas-runtime-ui/.env*`，按目标项目设置 `VITE_APP_PROJECT_CODE` 项目标识、`VITE_APP_NAME` 存储命名空间、`VITE_APP_DEV_PROXY_URL` 后端网关与 `VITE_PUBLIC_PATH` 部署基础路径。当前开发环境默认端口为 `9200`，生产构建产物位于 `saas-runtime-ui/dist/`，可独立部署。默认使用 SaaS 项目环境；独立模式脚本排除 SaaS 扩展并清空 `VITE_APP_ENVIRONMENT`。前端运行环境与后端 Maven 的 `saas.enabled` 依赖开关分别配置。
 
-新增业务页面放在 `runtime-ui/modules/` 下独立的业务模块中，通过 `index.ts`、`register.ts`、`baseMenu.ts` 等平台入口接入，复用前端壳、共享组件及菜单/权限机制；不直接修改标准业务模块实现。子模块提交由脚手架锁定，日常初始化使用上述命令，不通过 `git submodule update --remote` 自动推进所有子模块。新增标准 UI 子模块时，先核对其实际跨模块依赖，再在根 `.gitmodules` 中登记到 `runtime-ui/modules/`。
+新增业务页面在前端仓库的 `modules/` 下使用独立业务模块，通过 `index.ts`、`register.ts`、`baseMenu.ts` 等平台入口接入，复用前端壳、共享组件及菜单/权限机制。前端改动在对应仓库中提交并发布后，再更新脚手架的子模块指针；嵌套子模块同样逐层提交。日常初始化使用上述命令，不通过 `git submodule update --remote` 自动推进所有子模块。具体配置与模块开发方式见 [前端 README](saas-runtime-ui/README.md)，保持同一套上游实现。
 
 ### 配置 Maven 私服
 
@@ -116,7 +109,7 @@ mvn -Pmicroservice -Delasticsearch.major=8 clean compile
 
 Elasticsearch 选择使用 `elasticsearch.major` 属性，缺省为 7.x，值为 `8` 时选择 8.x。这样启用 SaaS 或数据库 profile 时不会意外关闭默认存储依赖。若手动使用存储 profile，应显式排除另一项，例如 `-Pmicroservice,es8x,!es7x`，避免同时引入两个版本。
 
-`runtime-ui` 是本分支的前端源码开发入口。现有 `bootstrap` 的 `ui` profile 和 `ui-service` 保留为 Maven 静态资源装配参考；这些资源独立发布，当前使用已发布的 `2.12.0-SNAPSHOT` 前端壳、数据源及可视化资源，其余模块为 `2.11.0-SNAPSHOT`，通过根 POM 的 `jetlinks.ui.*` 属性维护，不将其替换为尚未发布的 `2.20.0-SNAPSHOT`。
+`saas-runtime-ui` 是本分支的前端源码开发入口。现有 `bootstrap` 的 `ui` profile 和 `ui-service` 保留为 Maven 静态资源装配参考；这些资源独立发布，当前使用已发布的 `2.12.0-SNAPSHOT` 前端壳、数据源及可视化资源，其余模块为 `2.11.0-SNAPSHOT`，通过根 POM 的 `jetlinks.ui.*` 属性维护，不将其替换为尚未发布的 `2.20.0-SNAPSHOT`。
 
 `2.20` 的 OpenAI 智能体提供者使用 `ai-agent-openai`，旧坐标 `ai-openai` 不再使用。
 
