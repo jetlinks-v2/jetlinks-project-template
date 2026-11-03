@@ -150,6 +150,8 @@ Elasticsearch 选择使用 `elasticsearch.major` 属性，缺省为 7.x，值为
 
 属性缺省激活可以与其他 profile 组合。不要仅使用 `activeByDefault` 实现 SaaS 默认启用，否则同一 POM 激活其他 profile 时可能将其关闭。关闭 SaaS 也不代表关闭应用的功能权限和资产数据权限。
 
+接入运营中心还需要在认证服务配置 `jetlinks.saas.agent.server-uri`、`access-id` 和 `access-key`；单体装配时配置在实际引入 agent 的启动进程中。配置示例、运行时凭据来源、RSocket/TCP 端口和接入验证见 [SaaS agent 接入](docs/development-best-practices.md#接入-saas-的-agent-配置)。
+
 ## 开发边界
 
 ### 1. 应用作为独立微服务运行
@@ -202,6 +204,21 @@ public class BusinessRecordEntity extends ExtendableEntity<String> {
 ```
 
 `permission` 必须与后端 `@Resource` 的资源标识一致，`actions` 必须与后端实际声明的查询、保存、删除等操作一致；每个按钮只声明所需动作。后端仍须执行功能权限和资产数据权限检查，不能从菜单名称、URL 或按钮显隐推断授权，也不能用前端控制代替后端鉴权。
+
+## 多租户与多种部署模式的最佳实践
+
+完整指南见 [二次开发与多租户最佳实践](docs/development-best-practices.md)。私有化可以使用多租户，单体也可以接入 SaaS；业务代码通过公共契约与独立租户适配模块兼容这些组合，不为每种部署模式分别实现一套业务。
+
+| 场景 | 实践与文档入口 |
+| --- | --- |
+| 选择私有化、普通多租户或 SaaS 装配 | [部署组合与模块职责](docs/development-best-practices.md#部署组合)：区分业务、租户适配与运营中心，明确 Maven profile 的作用 |
+| 为标准对象扩展业务字段 | [关联表与查询边界](docs/development-best-practices.md#业务字段扩展)：自有表保存关联与业务字段，公开命令获取标准数据，QueryHelper 做本地查询和批量分页结果组合 |
+| 接入统一数据权限 | [业务模块统一数据权限手册](https://github.com/jetlinks-v2/jetlinks-components/blob/2.20/assets-component/docs/assets-permission-guide.md)：资产、关联资产、自定义接口、命令及私有化/租户范围兼容 |
+| 扩展自定义 metric、配额与能力 | [独立租户适配模块与指标接入](docs/development-best-practices.md#租户指标扩展)、[平台租户开发文档](https://github.com/jetlinks-v2/jetlinks-tenant/blob/2.20/README.md)、[tenant-ai-agent 实例](https://github.com/jetlinks-v2/jetlinks-tenant/blob/2.20/tenant-ai-agent/README.md) |
+| 认证服务接入 SaaS | [agent 配置、凭据来源与接入验收](docs/development-best-practices.md#接入-saas-的-agent-配置)：微服务在认证端配置，单体在实际装配进程配置 |
+| 微服务、后台任务及多副本 | [上下文与后台任务](docs/development-best-practices.md#上下文与后台任务)：统一身份传播、资源归属、共享限额与幂等计量 |
+| 租户开通、初始化和数据清理 | [租户数据生命周期](docs/development-best-practices.md#租户数据生命周期)：复用 TenantDataProvider / TenantDataManager，不跨服务直连数据库 |
+| 验证同一业务的多模式兼容性 | [兼容性验收](docs/development-best-practices.md#兼容性验收)：按实际改动覆盖私有化、租户隔离、单体/微服务、多副本及 SaaS 接入 |
 
 ## AI 开发入口
 
