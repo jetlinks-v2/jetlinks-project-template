@@ -36,9 +36,9 @@ CLUSTER_SEEDS: 127.0.0.1:18800
 
 # jwt相关配置
 
-## 私钥,请勿泄漏,仅配置到认证服务
+# 【生产环境必须更换】公开的开发默认私钥仅用于兼容；通过 JWT_PRIMARY_KEY 覆盖，仅认证服务持有，详见根 README。
 JWT_PRIMARY_KEY: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAi2vTFvhiPHPxUMt9BjzeUr55+jXuWGPKMVGRvGA0OP+bQdjaYeukYJvvNL3WQB/iUflUUoeb2EfWCkDT3WfpbQIDAQABAkALW8JB+zcsBaYbSivqKvtR2M+T+uDRtdxUuEVPO4DSdwfcLvQOO6jEpibM4WKUqrcshxAAPNy/dGC0hheHEi9hAiEApOzOhfKgcloq8ZaYsVqa3wlg2WYLVNM86+Ermdbc4zcCIQDYaZSPVXRJQVWDuYYP0QNBiUZUrR2GVU9WXOxzKUoyewIgbFsxbQv1omvfXw6kj5GJwxP0T6EdvMN0eT1dWhuy0I0CIQDVnZII0b8ROC5i8dQE9LmUDR6hIqhMGxVPGDZFjnIw1QIgSyHvCqseko4e4LboUUhWIN4iVlvgm4vyKEgrsD4ucdw=
 
-# 公钥,用于解码jwt,可配置到其他服务
+# 【生产环境必须更换】公开的开发默认公钥仅用于兼容；通过 JWT_PUBLIC_KEY 覆盖，须与认证私钥配套并同步所有验签服务。
 JWT_PUBLIC_KEY: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==
 

@@ -2,6 +2,9 @@
 
 `2.20` 分支用于基于 JetLinks 平台的二次开发：Java 17、JetLinks `2.20.0-SNAPSHOT`、Spring Boot `3.4.13`。平台依赖统一由根 `pom.xml` 的 `jetlinks.pro.version` 和 `jetlinks-parent` BOM 管理，应用自己的版本与平台依赖版本分别维护。
 
+> [!WARNING]
+> **生产环境必须更换默认 JWT 密钥对。** 模板为兼容开发与演示环境保留了已公开的默认密钥，不能用于生产。部署时须注入独立密钥对，并同步所有验签服务的公钥，详见 [JWT 密钥与生产环境](#jwt-密钥与生产环境)。
+
 ## 模块说明
 
 ```text
@@ -112,6 +115,39 @@ Elasticsearch 选择使用 `elasticsearch.major` 属性，缺省为 7.x，值为
 `saas-runtime-ui` 是本分支的前端源码开发入口。现有 `bootstrap` 的 `ui` profile 和 `ui-service` 保留为 Maven 静态资源装配参考；这些资源独立发布，当前使用已发布的 `2.12.0-SNAPSHOT` 前端壳、数据源及可视化资源，其余模块为 `2.11.0-SNAPSHOT`，通过根 POM 的 `jetlinks.ui.*` 属性维护，不将其替换为尚未发布的 `2.20.0-SNAPSHOT`。
 
 `2.20` 的 OpenAI 智能体提供者使用 `ai-agent-openai`，旧坐标 `ai-openai` 不再使用。
+
+### JWT 密钥与生产环境
+
+> [!WARNING]
+> **保留默认密钥只为兼容现有开发环境，不代表生产环境可使用。** 未配置或传入空值时，Compose 仍回退到原有默认密钥；启用 `prod` profile 也不会自动生成或更换密钥。生产部署必须显式覆盖下面两个参数。
+
+| 参数 | 含义与配置范围 |
+| --- | --- |
+| `JWT_PRIMARY_KEY` | 用于签发 JWT 的私钥，保持原有变量名；仅注入认证服务，使用 PKCS#8 DER 的单行 Base64 内容 |
+| `JWT_PUBLIC_KEY` | 用于校验 JWT 的配套公钥，使用 X.509/SPKI DER 的单行 Base64 内容；同步到所有 JWT 验签服务 |
+
+每个部署环境使用独立的 RSA 密钥对，生产密钥长度至少为 2048 bit。可在仓库外的受限目录执行以下命令：
+
+```bash
+umask 077
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt-private.pem
+openssl pkcs8 -topk8 -nocrypt -in jwt-private.pem -outform DER | openssl base64 -A > jwt-private.base64
+openssl pkey -in jwt-private.pem -pubout -outform DER | openssl base64 -A > jwt-public.base64
+```
+
+将两个 `.base64` 文件的完整内容分别作为对应参数的值，不传入文件路径或带 PEM 头尾的多行文本。真实私钥及包含私钥的环境文件不提交到仓库，通过部署环境或 Secret 管理。
+
+使用 [微服务 Compose](microservices/docker-compose.yml) 时，可在宿主机环境中设置这两个变量，或使用仓库外的受限环境文件，例如 `/secure/jetlinks/jwt.env`：
+
+```dotenv
+# 将占位内容替换为上面生成的单行 Base64 值
+JWT_PRIMARY_KEY=<私钥文件的完整内容>
+JWT_PUBLIC_KEY=<公钥文件的完整内容>
+```
+
+在项目根目录通过 `docker compose --env-file /secure/jetlinks/jwt.env -f microservices/docker-compose.yml up -d` 加载。Compose 会将公钥同步到公共服务环境，将私钥仅注入认证服务；直接运行微服务时，在相应进程的环境中注入同名变量。宿主机环境中的同名变量优先于 `--env-file`，部署时应检查实际来源，避免沿用其他环境的密钥。
+
+密钥更换会影响已签发 JWT 的校验，应协调认证服务与全部验签服务切换，并安排用户重新登录。JWT 密钥与 SaaS agent 的 `access-key` 分别配置，不能互相替代。
 
 ### SaaS 接入
 

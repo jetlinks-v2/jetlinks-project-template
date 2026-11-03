@@ -15,5 +15,5 @@ RPC_TOKEN: J@t1iNksR9~ # 集群连接通信密钥
 
 # jwt相关配置
 
-# 公钥,用于解码jwt
+# 【生产环境必须更换】公开的开发默认公钥仅用于兼容；通过 JWT_PUBLIC_KEY 覆盖，须与认证私钥配套并同步所有验签服务。
 JWT_PUBLIC_KEY: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==

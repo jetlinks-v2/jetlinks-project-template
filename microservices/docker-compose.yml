@@ -6,7 +6,9 @@ x-common-variables: &common-variables
   CLUSTER_SEEDS: api-gateway-service:18800
   RPC_TOKEN: J@t1iNksR9~
   spring.profiles.active: default,prod
-  JWT_PUBLIC_KEY: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==
+  # 【生产环境必须更换】默认 JWT 密钥对已公开，仅用于兼容开发/演示环境。
+  # 使用 JWT_PUBLIC_KEY 与 JWT_PRIMARY_KEY 成对覆盖；所有验签服务须同步公钥，详见根 README。
+  JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:-MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAItr0xb4Yjxz8VDLfQY83lK+efo17lhjyjFRkbxgNDj/m0HY2mHrpGCb7zS91kAf4lH5VFKHm9hH1gpA091n6W0CAwEAAQ==}
   logging.level.org.jetlinks.pro: warn
   logging.level.org.hswebframework: warn
 # 定义数据库环境变量
@@ -141,7 +143,9 @@ services:
         environment:
             <<: [*common-variables, *database-variables, *redis-variables, *elasticsearch-variables]
             CLUSTER_EXTERNAL_HOST: authentication-service
-            JWT_PRIMARY_KEY: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAi2vTFvhiPHPxUMt9BjzeUr55+jXuWGPKMVGRvGA0OP+bQdjaYeukYJvvNL3WQB/iUflUUoeb2EfWCkDT3WfpbQIDAQABAkALW8JB+zcsBaYbSivqKvtR2M+T+uDRtdxUuEVPO4DSdwfcLvQOO6jEpibM4WKUqrcshxAAPNy/dGC0hheHEi9hAiEApOzOhfKgcloq8ZaYsVqa3wlg2WYLVNM86+Ermdbc4zcCIQDYaZSPVXRJQVWDuYYP0QNBiUZUrR2GVU9WXOxzKUoyewIgbFsxbQv1omvfXw6kj5GJwxP0T6EdvMN0eT1dWhuy0I0CIQDVnZII0b8ROC5i8dQE9LmUDR6hIqhMGxVPGDZFjnIw1QIgSyHvCqseko4e4LboUUhWIN4iVlvgm4vyKEgrsD4ucdw=
+            # 【生产环境必须更换】保留开发默认私钥以兼容现有环境；生产请通过 JWT_PRIMARY_KEY 覆盖。
+            # 私钥仅注入认证服务，并同步替换公共配置中的配套公钥；不要提交真实密钥。
+            JWT_PRIMARY_KEY: ${JWT_PRIMARY_KEY:-MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAi2vTFvhiPHPxUMt9BjzeUr55+jXuWGPKMVGRvGA0OP+bQdjaYeukYJvvNL3WQB/iUflUUoeb2EfWCkDT3WfpbQIDAQABAkALW8JB+zcsBaYbSivqKvtR2M+T+uDRtdxUuEVPO4DSdwfcLvQOO6jEpibM4WKUqrcshxAAPNy/dGC0hheHEi9hAiEApOzOhfKgcloq8ZaYsVqa3wlg2WYLVNM86+Ermdbc4zcCIQDYaZSPVXRJQVWDuYYP0QNBiUZUrR2GVU9WXOxzKUoyewIgbFsxbQv1omvfXw6kj5GJwxP0T6EdvMN0eT1dWhuy0I0CIQDVnZII0b8ROC5i8dQE9LmUDR6hIqhMGxVPGDZFjnIw1QIgSyHvCqseko4e4LboUUhWIN4iVlvgm4vyKEgrsD4ucdw=}
             ADMIN_USER_PASSWORD: ${ADMIN_USER_PASSWORD:-HT@@sv2Pd0}
             JAVA_OPTS: -Xmx1G
         volumes:

@@ -115,9 +115,9 @@ jetlinks:
                 host: ${jetlinks.cluster.external-host}
         token:
             jwt:
-                #用于编码jwt的私钥,禁止泄漏,生产环境请更换此KEY,可使用test下的RsaGenerator生成.
+                # JWT 签名私钥，仅认证服务持有；生产环境必须更换，格式及注入方式见根 README。
                 encode-key: ${JWT_PRIMARY_KEY}
-                #用于解码jwt的公钥
+                # JWT 验签公钥，须与签名私钥配套并同步到所有验签服务。
                 decode-key: ${JWT_PUBLIC_KEY}
     logging:
         system:
