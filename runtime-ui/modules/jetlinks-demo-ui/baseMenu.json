@@ -1,0 +1,41 @@
+[
+  {
+    "id": "demo-record-menu",
+    "code": "demo/Record",
+    "name": "示例记录",
+    "url": "/demo/record",
+    "owner": "app",
+    "icon": "UnorderedListOutlined",
+    "sortIndex": 1,
+    "i18nMessages": {
+      "name": { "zh_CN": "示例记录", "en_US": "Example Records", "en": "Example Records" }
+    },
+    "showPage": ["demo-record"],
+    "permissions": [
+      { "permission": "demo-record", "actions": ["query"] }
+    ],
+    "buttons": [
+      {
+        "id": "add",
+        "name": "新增",
+        "i18nMessages": { "zh_CN": "新增", "en_US": "Add", "en": "Add" },
+        "permissions": [{ "permission": "demo-record", "actions": ["save"] }]
+      },
+      {
+        "id": "update",
+        "name": "编辑",
+        "i18nMessages": { "zh_CN": "编辑", "en_US": "Edit", "en": "Edit" },
+        "permissions": [{ "permission": "demo-record", "actions": ["save"] }]
+      },
+      {
+        "id": "delete",
+        "name": "删除",
+        "i18nMessages": { "zh_CN": "删除", "en_US": "Delete", "en": "Delete" },
+        "permissions": [{ "permission": "demo-record", "actions": ["delete"] }]
+      }
+    ],
+    "accessSupport": { "text": "支持", "value": "support" },
+    "supportDataAccess": true,
+    "assetType": "demo-record"
+  }
+]

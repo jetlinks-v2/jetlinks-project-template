@@ -179,6 +179,14 @@
             </modules>
         </profile>
 
+        <profile>
+            <id>demo</id>
+            <modules>
+                <module>modules/examples/demo-manager</module>
+                <module>microservices/demo-service</module>
+            </modules>
+        </profile>
+
         <!-- 微服务项目运行时请设置 -P microservice -->
         <profile>
             <id>microservice</id>

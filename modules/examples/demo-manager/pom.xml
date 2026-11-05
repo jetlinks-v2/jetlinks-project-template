@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jetlinks.pro</groupId>
+        <artifactId>jetlinks-project-template</artifactId>
+        <version>2.20.0-SNAPSHOT</version>
+        <relativePath>../../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>demo-manager</artifactId>
+    <name>应用示例业务模块</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- H2 测试数据库已包含 MVStore，避免公共组件的独立旧版 MVStore 覆盖驱动内部类。 -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>com.h2database:h2-mvstore</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hswebframework.web</groupId>
+            <artifactId>hsweb-commons-crud</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>assets-component</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
+            <artifactId>test-component</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

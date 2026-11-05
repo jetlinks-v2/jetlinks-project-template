@@ -10,12 +10,13 @@
 ```text
 jetlinks-project-template
 ├── bootstrap                         平台单体启动参考
-├── saas-runtime-ui                   完整运行时前端（Git 子模块，2.20 分支）
-│   ├── jetlinks-web-core             平台前端壳（嵌套 Git 子模块）
-│   └── modules                       SaaS 扩展及标准业务 UI
-├── microservices                     平台微服务启动参考
+├── runtime-ui                        当前项目前端工作区
+│   ├── jetlinks-web-core             平台前端壳与共享能力
+│   └── modules                       标准 UI、SaaS 扩展及独立业务 UI
+├── microservices                     平台及独立应用的微服务启动模块
 │   ├── api-gateway-service           API 网关
 │   ├── authentication-service        认证服务
+│   ├── demo-service                  独立应用示例启动服务
 │   ├── file-service                  文件服务
 │   ├── iot-service                   物联网服务
 │   ├── notify-service                通知服务
@@ -24,10 +25,11 @@ jetlinks-project-template
 │   └── ui-service                    前端资源服务
 └── modules                           应用业务模块
     └── examples                      CRUD、命令、规则引擎等示例
-        └── mvc-service               独立 MVC 服务启动示例
+        ├── mvc-service               独立 MVC 服务启动示例
+        └── demo-manager              独立应用业务示例
 ```
 
-`bootstrap` 和已有平台微服务用于了解平台装配方式。二开应用的业务模块放在 `modules/`，由应用自己的独立微服务启动模块装配，遵守下文的开发边界。
+`bootstrap` 和已有平台微服务用于了解平台装配方式。二开应用的业务实现放在 `modules/`，独立启动服务可在 `microservices/` 下建立自己的目录，装配所需业务模块；不向既有平台服务的内部业务添加实现。
 
 ## 使用
 
@@ -45,15 +47,14 @@ git remote add origin {项目远程仓库地址}
 
 ### 初始化与开发前端
 
-`saas-runtime-ui/` 直接通过 Git 子模块复用完整的 [SaaS 运行时前端仓库](https://github.com/jetlinks-v2/saas-runtime-ui)，跟踪 `2.20` 分支并锁定提交。前端壳、SaaS 扩展、认证、设备、规则引擎、边缘网关等能力及其依赖和构建配置统一由该仓库维护。其内部标准 UI 仍通过嵌套子模块引入，应递归初始化：
+当前项目在 `runtime-ui/` 安装依赖、启动和开发前端，复用其中已有的前端壳、认证、设备、规则引擎、边缘网关及 SaaS 扩展。依赖、脚本与环境配置以该工作区为准：
 
 ```bash
-# 已克隆仓库时，在项目根目录递归初始化；压缩包不包含子模块源码，应改用 Git 克隆
-git submodule sync --recursive
+# 首次克隆后，在项目根目录按锁定提交初始化标准前端子模块
 git submodule update --init --recursive
 
 # Node.js >= 22.18.0，pnpm >= 10
-cd saas-runtime-ui
+cd runtime-ui
 pnpm install
 pnpm dev
 
@@ -63,17 +64,15 @@ pnpm dev:proxy http://localhost:8844
 # 生产构建
 pnpm build
 
-# 不使用 SaaS 项目环境时，使用上游提供的独立模式
-pnpm dev:standalone
-pnpm build:standalone
-
 # 仅构建指定业务模块，将 my-business-ui 替换为实际模块名称
 pnpm build:modules my-business-ui
 ```
 
-前端环境配置位于 `saas-runtime-ui/.env*`，按目标项目设置 `VITE_APP_PROJECT_CODE` 项目标识、`VITE_APP_NAME` 存储命名空间、`VITE_APP_DEV_PROXY_URL` 后端网关与 `VITE_PUBLIC_PATH` 部署基础路径。当前开发环境默认端口为 `9200`，生产构建产物位于 `saas-runtime-ui/dist/`，可独立部署。默认使用 SaaS 项目环境；独立模式脚本排除 SaaS 扩展并清空 `VITE_APP_ENVIRONMENT`。前端运行环境与后端 Maven 的 `saas.enabled` 依赖开关分别配置。
+前端环境配置位于 `runtime-ui/.env*`，开发端口由 `VITE_PORT` 决定；按目标项目配置 `VITE_APP_PROJECT_CODE`、`VITE_APP_DEV_PROXY_URL` 和 `VITE_PUBLIC_PATH`。`VITE_APP_NAME=iot` 用于存储命名及默认系统菜单查询，不替换为本地工程名；进入业务应用后，平台按应用实例作用域查询 `owner=app` 菜单。构建产物位于 `runtime-ui/dist/`，可独立部署。前端运行环境与后端 Maven 的 `saas.enabled` 依赖开关分别配置。
 
-新增业务页面在前端仓库的 `modules/` 下使用独立业务模块，通过 `index.ts`、`register.ts`、`baseMenu.ts` 等平台入口接入，复用前端壳、共享组件及菜单/权限机制。前端改动在对应仓库中提交并发布后，再更新脚手架的子模块指针；嵌套子模块同样逐层提交。日常初始化使用上述命令，不通过 `git submodule update --remote` 自动推进所有子模块。具体配置与模块开发方式见 [前端 README](saas-runtime-ui/README.md)，保持同一套上游实现。
+新增业务页面放在 `runtime-ui/modules/` 的独立模块，通过 `index.ts`、`baseMenu.ts` 等平台入口接入；实际需要公共扩展时再声明 `register.ts`，复用现有路由、菜单、权限和公共组件。
+
+`.gitmodules` 直接登记 `runtime-ui/jetlinks-web-core` 及认证、设备、边缘网关、规则引擎标准 UI 子模块，跟踪 `2.20` 并锁定提交；SaaS 扩展与示例 UI 由当前工作区维护。初始化使用锁定提交，不通过 `git submodule update --remote` 推进全部上游提交。
 
 ### 配置 Maven 私服
 
@@ -101,6 +100,9 @@ mvn -U -Pmicroservice clean compile
 # 构建独立 MVC 服务及其依赖示例
 mvn -U -Pexample -pl modules/examples/mvc-service -am clean compile
 
+# 构建并验证独立应用示例
+mvn -Pdemo -pl microservices/demo-service -am verify
+
 # 显式关闭 SaaS；可与 standalone、microservice、example 等 profile 组合
 mvn -Pmicroservice -Dsaas.enabled=false clean compile
 
@@ -110,9 +112,15 @@ mvn -Pmicroservice -Delasticsearch.major=8 clean compile
 
 `standalone` 是根 POM 的默认 profile。显式启用 `example` 或其他根 profile 时，如需同时构建单体模块，应使用 `-Pstandalone,example`。
 
+独立应用示例由 `demo` profile 选择，聚合 `modules/examples/demo-manager/` 业务模块与 `microservices/demo-service/` 启动服务；测试前端位于 `runtime-ui/modules/jetlinks-demo-ui/`。示例通过现有应用中心、模板和应用菜单接入，操作步骤见 [新增应用本地接入 SaaS 测试环境操作指南](docs/新增应用本地接入SaaS测试环境操作指南.pdf)。
+
+SaaS 项目需先在 cloud 端订阅包含示例菜单的服务并同步到 runtime，再配置应用模板、实例与角色。应用角色授权不能代替项目的服务菜单订阅。
+
+按示例说明注入数据库、Redis、集群及验签配置后，可在仓库根目录使用 `java -jar microservices/demo-service/target/application.jar` 运行构建产物；服务加入既有集群，前端通过现有网关访问 `/demo/record`。
+
 Elasticsearch 选择使用 `elasticsearch.major` 属性，缺省为 7.x，值为 `8` 时选择 8.x。这样启用 SaaS 或数据库 profile 时不会意外关闭默认存储依赖。若手动使用存储 profile，应显式排除另一项，例如 `-Pmicroservice,es8x,!es7x`，避免同时引入两个版本。
 
-`saas-runtime-ui` 是本分支的前端源码开发入口。现有 `bootstrap` 的 `ui` profile 和 `ui-service` 保留为 Maven 静态资源装配参考；这些资源独立发布，当前使用已发布的 `2.12.0-SNAPSHOT` 前端壳、数据源及可视化资源，其余模块为 `2.11.0-SNAPSHOT`，通过根 POM 的 `jetlinks.ui.*` 属性维护，不将其替换为尚未发布的 `2.20.0-SNAPSHOT`。
+`runtime-ui` 是当前项目的前端源码开发入口。现有 `bootstrap` 的 `ui` profile 和 `ui-service` 保留为 Maven 静态资源装配参考；这些资源独立发布，当前使用已发布的 `2.12.0-SNAPSHOT` 前端壳、数据源及可视化资源，其余模块为 `2.11.0-SNAPSHOT`，通过根 POM 的 `jetlinks.ui.*` 属性维护，不将其替换为尚未发布的 `2.20.0-SNAPSHOT`。
 
 `2.20` 的 OpenAI 智能体提供者使用 `ai-agent-openai`，旧坐标 `ai-openai` 不再使用。
 

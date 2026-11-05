@@ -1,0 +1,25 @@
+{
+  "demo": {
+    "record": {
+      "name": "Name",
+      "description": "Description",
+      "createTime": "Created At",
+      "actions": "Actions",
+      "add": "Add Record",
+      "delete": "Delete",
+      "deleteConfirm": "Delete “{name}”?",
+      "nameRequired": "Enter a name",
+      "namePlaceholder": "Enter the record name",
+      "descriptionPlaceholder": "Enter a description",
+      "searchPlaceholder": "Filter records by name",
+      "empty": "No example records",
+      "emptyCreate": "No example records. Add the first one.",
+      "noMatches": "No matching records",
+      "loadFailed": "Records could not be loaded. Search again.",
+      "saveFailed": "Save failed. Your changes have not been saved.",
+      "saveSuccess": "Saved “{name}”",
+      "deleteSuccess": "Deleted “{name}”",
+      "saving": "Saving"
+    }
+  }
+}

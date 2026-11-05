@@ -40,8 +40,8 @@
 - `modules/`：独立应用的业务模块；`modules/examples/` 提供 CRUD、命令、事件、规则引擎、MVC 等参考。
 - `modules/examples/mvc-service/`：独立 MVC 业务微服务启动示例；新应用应建立自己的启动模块并只装配所需业务能力。
 - `bootstrap/`：平台单体装配参考，不作为二开业务的默认部署边界。
-- `microservices/`：平台网关、认证、设备、通知等标准服务的启动参考，不在其中直接添加二开业务。
-- `saas-runtime-ui/`：通过根 `.gitmodules` 引入的完整 SaaS 运行时前端仓库，跟踪 `2.20` 并锁定提交。依赖、环境与构建配置由该仓库维护；前端壳、规则引擎、边缘网关等标准 UI 沿用其嵌套子模块，SaaS 扩展沿用其已有源码。
+- `microservices/`：平台网关、认证、设备、通知等标准服务及独立应用的启动模块；二开应用在自己的启动目录中装配业务模块，不向既有标准服务内部添加业务实现。`microservices/demo-service/` 为应用示例启动服务，业务实现位于 `modules/examples/demo-manager/`。
+- `runtime-ui/`：当前项目的独立前端工作区，依赖、启动脚本与环境以该目录为准；复用已有 `jetlinks-web-core/`、标准业务 UI 和 SaaS 扩展，新增业务放在其 `modules/`。
 - 根 `pom.xml`：应用版本、平台 BOM、构建插件与启动 profile 的统一入口。平台版本通过 `jetlinks.pro.version` 管理，不绑定到应用自己的版本。
 - 根 `README.md`：初始化、构建、SaaS profile、前后端开发边界及 Agent 入口说明。
 
@@ -54,10 +54,10 @@
 
 ## Repo Scope Routing
 
-- 后端二开优先落在 `modules/` 和应用自己的独立启动服务，不直接扩展标准服务的内部实体或字段。
+- 后端二开的业务实现放在 `modules/`，独立应用启动服务可放在 `microservices/` 下自己的目录，只装配所需业务及公共运行时，不直接扩展标准服务的内部实体或字段。
 - 不为设备等标准对象的业务扩展引入 `device-manager` 等实现模块；业务信息使用应用自己的关联表，通过标准对象 ID 建立关联，标准数据及操作通过平台公开命令获取，保留身份和权限上下文。
 - 数据权限按平台统一机制实现：业务实体继承 `ExtendableEntity`，通过 `@Asset` 声明资产类型，并配套 `AssetsHolder` 控制器、查询或操作权限校验；不手写平行的租户/部门/创建人过滤体系。
-- 项目内部前端只接入 `saas-runtime-ui/`；新增业务放在其 `modules/` 的独立业务模块，复用平台路由、菜单、权限及公共组件；前端改动先在对应仓库提交并发布，再逐层更新子模块指针。
+- 项目内部前端使用 `runtime-ui/`；新增业务放在 `runtime-ui/modules/` 的独立业务模块，复用平台路由、菜单、权限及公共组件。前端壳与标准 UI 按 `.gitmodules` 中的锁定提交初始化，不覆盖现有本地前端代码。
 - 前端菜单、按钮的 `permissions[].permission` / `actions` 与后端资源及操作标识一致；前端显隐不能替代后端功能权限和资产数据权限。
 - 平台启动参考中的标准模块装配不是业务应用的依赖清单；SaaS 运行时与运营控制端分属不同边界，业务服务不引入 `saas-manager`。
 
@@ -191,14 +191,14 @@
 
 ## Frontend Scope Guardrails
 
-本仓库的前端边界是 `saas-runtime-ui/`，直接复用完整的 SaaS 运行时前端仓库，可独立构建部署。统一使用其配置、SaaS 扩展和嵌套标准 UI 子模块，不在脚手架中复制或另行拼装同一套前端实现。
+本仓库当前前端边界是 `runtime-ui/`，在该目录安装依赖、启动及开发，使用其已有配置、SaaS 扩展、标准业务模块与公共组件。前端壳与标准 UI 通过该目录中的 Git 子模块复用，SaaS 扩展位于 `runtime-ui/modules/saas-runtime-ui/`。
 
-1. 在前端子模块内部先读取适用的 `AGENTS.md`、`CLAUDE.md`、模块说明和导出，按目标业务模块收敛搜索。
-2. 业务页面及扩展放入独立业务模块，沿平台模块注册、菜单、路由、权限声明和国际化约定实现。
+1. 在 `runtime-ui/` 及目标模块中先读取适用的 `AGENTS.md`、`CLAUDE.md`、模块说明和导出，按目标业务模块收敛搜索。
+2. 业务页面及扩展放入 `runtime-ui/modules/` 的独立业务模块，沿平台模块注册、菜单、路由、权限声明和国际化约定实现。
 3. 未经用户要求，不修改前端壳、共享组件或标准模块私有实现来适配一个业务场景。
 4. 新页面、页面壳层或主要交互先使用 `jetlinks-web-style` 选型，再使用 `jetlinks-web` 实现；局部字段、样式和文案调整按 skill 的局部调整规则处理。
 5. 视觉打磨需先确认本地样式锚点，再结合 `frontend-design`，最终以工作区组件及 Ant Design 风格为准。
-6. `microservices/ui-service` 与 `bootstrap` 的 `ui` profile 是历史 Maven 资源装配参考，不代替 `saas-runtime-ui` 的二开入口。
+6. `microservices/ui-service` 与 `bootstrap` 的 `ui` profile 是历史 Maven 资源装配参考，不代替 `runtime-ui` 的二开入口。
 
 ## Delivery And Verification
 
