@@ -1,0 +1,11 @@
+packages:
+  - "jetlinks-web-core"
+  - "modules/*"
+
+onlyBuiltDependencies:
+  - core-js
+  - es5-ext
+  - esbuild
+  - sharp
+  - vue-demi
+  - vue3-danmaku

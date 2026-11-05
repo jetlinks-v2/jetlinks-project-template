@@ -1,4 +1,20 @@
-[submodule "saas-runtime-ui"]
-	path = saas-runtime-ui
-	url = git@github.com:jetlinks-v2/saas-runtime-ui.git
+[submodule "runtime-ui/jetlinks-web-core"]
+	path = runtime-ui/jetlinks-web-core
+	url = git@github.com:jetlinks-v2/jetlinks-web-core.git
+	branch = 2.20
+[submodule "runtime-ui/modules/authentication-manager-ui"]
+	path = runtime-ui/modules/authentication-manager-ui
+	url = git@github.com:jetlinks-v2/authentication-manager-ui.git
+	branch = 2.20
+[submodule "runtime-ui/modules/device-manager-ui"]
+	path = runtime-ui/modules/device-manager-ui
+	url = git@github.com:jetlinks-v2/device-manager-ui.git
+	branch = 2.20
+[submodule "runtime-ui/modules/edge-master-ui"]
+	path = runtime-ui/modules/edge-master-ui
+	url = git@github.com:jetlinks-v2/edge-master-ui.git
+	branch = 2.20
+[submodule "runtime-ui/modules/rule-engine-manager-ui"]
+	path = runtime-ui/modules/rule-engine-manager-ui
+	url = git@github.com:jetlinks-v2/rule-engine-manager-ui.git
 	branch = 2.20

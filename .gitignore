@@ -1,5 +1,9 @@
 **/pom.xml.versionsBackup
 **/target/
+**/node_modules/
+**/dist/
+**/coverage/
+**/.pnpm-store/
 **/out/
 *.class
 # Mobile Tools for Java (J2ME)

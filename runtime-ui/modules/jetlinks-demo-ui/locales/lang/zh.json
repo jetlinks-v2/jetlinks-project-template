@@ -1,0 +1,25 @@
+{
+  "demo": {
+    "record": {
+      "name": "名称",
+      "description": "说明",
+      "createTime": "创建时间",
+      "actions": "操作",
+      "add": "新增记录",
+      "delete": "删除",
+      "deleteConfirm": "确认删除“{name}”？",
+      "nameRequired": "请输入名称",
+      "namePlaceholder": "输入记录名称",
+      "descriptionPlaceholder": "输入记录说明",
+      "searchPlaceholder": "按名称筛选记录",
+      "empty": "暂无示例记录",
+      "emptyCreate": "暂无示例记录，先新增一条",
+      "noMatches": "暂无符合条件的记录",
+      "loadFailed": "记录加载失败，请重新查询",
+      "saveFailed": "保存失败，当前修改尚未保存",
+      "saveSuccess": "已保存“{name}”",
+      "deleteSuccess": "已删除“{name}”",
+      "saving": "保存中"
+    }
+  }
+}

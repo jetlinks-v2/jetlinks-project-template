@@ -1,0 +1,14 @@
+{
+  "name": "jetlinks-demo-ui",
+  "id": "jetlinks-demo",
+  "version": "1.0.0",
+  "description": "JetLinks 测试应用示例",
+  "main": "index.ts",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter jetlinks-web-core dev -- --module-name jetlinks-demo-ui",
+    "build": "pnpm --filter jetlinks-web-core build -- -- --module-name jetlinks-demo-ui"
+  },
+  "dependencies": {},
+  "peerDependencies": {}
+}
