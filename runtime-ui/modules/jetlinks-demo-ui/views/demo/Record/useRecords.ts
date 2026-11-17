@@ -1,10 +1,10 @@
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { usePermission } from '@jetlinks-web/hooks'
 import { onlyMessage } from '@jetlinks-web/utils'
 import type { ConditionFilterChangePayload, ConditionFilterField } from '@jetlinks-web-core/components/ConditionFilter'
-import { createRecord, deleteRecord, queryRecords, updateRecord } from '../../../api'
-import type { DemoRecord, DemoRecordDraft, DemoRecordQuery, EditableRecordField } from '../../../types'
+import { createRecord, deleteRecord, queryInspectionTeams, queryRecords, updateRecord } from '../../../api'
+import type { DemoRecord, DemoRecordDraft, DemoRecordQuery, EditableRecordField, InspectionTeam } from '../../../types'
 
 export const useRecords = () => {
   const { t } = useI18n()
@@ -13,7 +13,11 @@ export const useRecords = () => {
   const tableRef = ref<{ reload: () => void }>()
   const params = ref<ConditionFilterChangePayload['filter']>({ terms: [] })
   const createOpen = ref(false)
-  const createDraft: DemoRecordDraft = { name: '', description: '' }
+  const editingRecord = ref<DemoRecord>()
+  const teams = ref<InspectionTeam[]>([])
+  const teamsLoading = ref(false)
+  const teamsLoadFailed = ref(false)
+  const teamNames = computed(() => new Map(teams.value.map(team => [team.id, team.name])))
   const loadFailed = ref(false)
   const savingIds = ref<string[]>([])
   const deletingIds = ref<string[]>([])
@@ -23,32 +27,41 @@ export const useRecords = () => {
 
   const columns = computed(() => [
     { title: t('demo.record.name'), dataIndex: 'name', key: 'name', scopedSlots: true, width: 260 },
+    { title: t('demo.record.inspectionTeam'), dataIndex: 'inspectionTeamId', key: 'inspectionTeamId', scopedSlots: true, width: 180 },
+    { title: t('demo.record.itemCount'), dataIndex: 'inspectionItems', key: 'inspectionItems', scopedSlots: true, width: 100 },
     { title: t('demo.record.description'), dataIndex: 'description', key: 'description', scopedSlots: true },
     { title: t('demo.record.createTime'), dataIndex: 'createTime', key: 'createTime', scopedSlots: true, width: 190 },
-    { title: t('demo.record.actions'), dataIndex: 'action', key: 'action', scopedSlots: true, width: 100 },
+    { title: t('demo.record.actions'), dataIndex: 'action', key: 'action', scopedSlots: true, width: 200 },
   ])
-  const filterFields = computed<ConditionFilterField[]>(() => [{
-    title: t('demo.record.name'),
-    dataIndex: 'name',
-    search: { type: 'string', defaultTermType: 'like' },
-  }])
-  const createSchema = computed(() => [
+  const filterFields = computed<ConditionFilterField[]>(() => [
     {
-      name: 'name',
-      label: t('demo.record.name'),
-      itemType: 'input',
-      componentProps: { maxlength: 64, placeholder: t('demo.record.namePlaceholder') },
-      rules: [{ required: true, whitespace: true, message: t('demo.record.nameRequired') }],
+      title: t('demo.record.name'),
+      dataIndex: 'name',
+      search: { type: 'string', defaultTermType: 'like' },
     },
     {
-      name: 'description',
-      label: t('demo.record.description'),
-      itemType: 'textarea',
-      componentProps: { rows: 3, maxlength: 512, placeholder: t('demo.record.descriptionPlaceholder') },
+      title: t('demo.record.inspectionTeam'),
+      dataIndex: 'inspectionTeamId',
+      search: { type: 'select', options: teams.value.map(team => ({ label: team.name, value: team.id })) },
     },
   ])
 
   const reload = () => tableRef.value?.reload()
+
+  /** 目录统一加载，避免每条计划单独请求班组。 */
+  const loadTeams = async () => {
+    teamsLoading.value = true
+    try {
+      const response = await queryInspectionTeams()
+      teamsLoadFailed.value = !response.success
+      if (response.success) teams.value = response.result
+    } catch {
+      teamsLoadFailed.value = true
+    } finally {
+      teamsLoading.value = false
+    }
+  }
+  onMounted(loadTeams)
 
   const loadRecords = async (query: DemoRecordQuery, options?: { signal?: AbortSignal }) => {
     const response = await queryRecords(query, options)
@@ -61,14 +74,26 @@ export const useRecords = () => {
   }
 
   const create = async (value: DemoRecordDraft) => {
-    const response = await createRecord({ name: value.name, description: value.description })
+    const response = await createRecord(value)
     if (response.success) onlyMessage(t('demo.record.saveSuccess', { name: value.name }))
     return response
   }
 
   const created = () => {
     createOpen.value = false
+    editingRecord.value = undefined
     reload()
+  }
+
+  /** 清单与班组单独提交，避免覆盖列表中仍在编辑的名称、说明。 */
+  const saveInspection = async (value: DemoRecordDraft) => {
+    const record = editingRecord.value!
+    const response = await updateRecord(record.id, {
+      inspectionTeamId: value.inspectionTeamId,
+      inspectionItems: value.inspectionItems,
+    })
+    if (response.success) onlyMessage(t('demo.record.saveSuccess', { name: record.name }))
+    return response
   }
 
   /** 临时输入与服务端记录分离；失败保留输入并标明未保存，同一行保存期间暂停其他编辑。 */
@@ -83,8 +108,6 @@ export const useRecords = () => {
     savingIds.value.push(record.id)
     try {
       const response = await updateRecord(record.id, {
-        name: record.name,
-        description: record.description ?? '',
         [field]: value,
       })
       if (response.success && response.result) {
@@ -119,8 +142,9 @@ export const useRecords = () => {
   }
 
   return {
-    tableRef, params, columns, filterFields, createSchema, createDraft, createOpen, loadFailed,
+    tableRef, params, columns, filterFields, createOpen, editingRecord, loadFailed,
+    teams, teamsLoading, teamsLoadFailed, teamNames,
     canUpdate, canCreate, savingIds, deletingIds, drafts, fieldErrors, editableFields,
-    loadRecords, search, create, created, saveField, remove,
+    loadRecords, search, create, created, saveInspection, saveField, remove,
   }
 }

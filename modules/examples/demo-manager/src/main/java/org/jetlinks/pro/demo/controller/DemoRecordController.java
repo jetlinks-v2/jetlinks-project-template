@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/demo/record")
-@Resource(id = DemoAssetType.TYPE_ID, name = "示例记录")
+@Resource(id = DemoAssetType.TYPE_ID, name = "巡检计划")
 @AssetsController(type = DemoAssetType.TYPE_ID)
-@Tag(name = "示例记录")
+@Tag(name = "巡检计划")
 @AllArgsConstructor
 @Getter
 public class DemoRecordController implements AssetsHolderCrudController<DemoRecordEntity, String> {

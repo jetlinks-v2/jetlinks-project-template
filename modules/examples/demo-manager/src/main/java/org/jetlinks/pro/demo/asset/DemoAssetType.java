@@ -16,15 +16,14 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public enum DemoAssetType implements EnumAssetType {
-    record("示例记录", Arrays.asList(CrudAssetPermission.values()));
+    record("demo-record", "巡检计划", Arrays.asList(CrudAssetPermission.values())),
+    inspectionTeam("demo-inspection-team", "巡检班组", Arrays.asList(CrudAssetPermission.values()));
 
     public static final String TYPE_ID = "demo-record";
+    public static final String TEAM_TYPE_ID = "demo-inspection-team";
 
+    private final String id;
     private final String name;
     private final List<AssetPermission> permissions;
 
-    @Override
-    public String getId() {
-        return TYPE_ID;
-    }
 }

@@ -2,6 +2,7 @@
   <j-page-container>
     <FullPage has-padding transparent-background>
       <a-alert v-if="loadFailed" type="error" show-icon :message="$t('demo.record.loadFailed')" />
+      <a-alert v-if="teamsLoadFailed" type="error" show-icon :message="$t('demo.team.loadFailed')" />
       <j-pro-table
         ref="tableRef"
         class="demo-record-table"
@@ -11,7 +12,7 @@
         :request="loadRecords"
         :params="params"
         :default-params="{ sorts: [{ name: 'createTime', order: 'desc' }] }"
-        :scroll="{ x: 780 }"
+        :scroll="{ x: 1180 }"
         @request-error="loadFailed = true"
       >
         <template #headerLeftRender>
@@ -22,10 +23,19 @@
           />
         </template>
         <template #headerRightRender>
-          <j-permission-button type="primary" has-permission="demo/Record:add" @click="createOpen = true">
-            <AIcon type="PlusOutlined" />
-            {{ $t('demo.record.add') }}
-          </j-permission-button>
+          <a-space>
+            <a-button v-if="canOpenTeams" @click="menuStore.jumpPage('demo/InspectionTeam')">{{ $t('demo.team.manage') }}</a-button>
+            <j-permission-button type="primary" has-permission="demo/Record:add" :disabled="teamsLoading || teamsLoadFailed" @click="createOpen = true">
+              <AIcon type="PlusOutlined" />
+              {{ $t('demo.record.add') }}
+            </j-permission-button>
+          </a-space>
+        </template>
+        <template #inspectionTeamId="record">
+          <j-ellipsis>{{ teamNames.get(record.inspectionTeamId) || record.inspectionTeamId }}</j-ellipsis>
+        </template>
+        <template #inspectionItems="record">
+          {{ record.inspectionItems.length }}
         </template>
         <template v-for="field in editableFields" :key="field" #[field]="record">
           <div class="demo-record-cell">
@@ -47,6 +57,14 @@
         <template #action="record">
           <j-permission-button
             type="link"
+            has-permission="demo/Record:update"
+            :disabled="savingIds.includes(record.id) || deletingIds.includes(record.id) || teamsLoading || teamsLoadFailed"
+            @click="editingRecord = record"
+          >
+            {{ $t('demo.record.editInspection') }}
+          </j-permission-button>
+          <j-permission-button
+            type="link"
             danger
             has-permission="demo/Record:delete"
             :loading="deletingIds.includes(record.id)"
@@ -62,13 +80,12 @@
         </template>
       </j-pro-table>
     </FullPage>
-    <EditDialog
-      v-if="createOpen"
-      :title="$t('demo.record.add')"
-      :schema="createSchema"
-      :data="createDraft"
-      :request="create"
-      @close="createOpen = false"
+    <RecordEditor
+      v-if="createOpen || editingRecord"
+      :record="editingRecord"
+      :teams="teams"
+      :request="editingRecord ? saveInspection : create"
+      @close="createOpen = false; editingRecord = undefined"
       @save="created"
     />
   </j-page-container>
@@ -76,16 +93,21 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { computed, defineAsyncComponent } from 'vue'
 import { FullPage } from '@jetlinks-web-core/layout'
 import ConditionFilter from '@jetlinks-web-core/components/ConditionFilter'
 import InputEditable from '@jetlinks-web-core/components/Editable/InputEditable.vue'
-import EditDialog from '@jetlinks-web-core/components/EditDialog/index.vue'
+import { useMenuStore } from '@jetlinks-web-core/store/menu'
 import { useRecords } from './useRecords'
 
+const RecordEditor = defineAsyncComponent(() => import('./RecordEditor.vue'))
+const menuStore = useMenuStore()
+const canOpenTeams = computed(() => menuStore.hasMenu('demo/InspectionTeam'))
 const {
-  tableRef, params, columns, filterFields, createSchema, createDraft, createOpen, loadFailed,
+  tableRef, params, columns, filterFields, createOpen, editingRecord, loadFailed,
+  teams, teamsLoading, teamsLoadFailed, teamNames,
   canUpdate, canCreate, savingIds, deletingIds, drafts, fieldErrors, editableFields,
-  loadRecords, search, create, created, saveField, remove,
+  loadRecords, search, create, created, saveInspection, saveField, remove,
 } = useRecords()
 </script>
 

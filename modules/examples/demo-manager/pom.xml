@@ -39,6 +39,12 @@
         </dependency>
         <dependency>
             <groupId>org.jetlinks.pro</groupId>
+            <artifactId>tenant-component</artifactId>
+            <version>${jetlinks.pro.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.jetlinks.pro</groupId>
             <artifactId>test-component</artifactId>
             <scope>test</scope>
         </dependency>
