@@ -2,10 +2,12 @@ package org.jetlinks.pro.demo;
 
 import org.hswebframework.web.authorization.basic.configuration.EnableAopAuthorize;
 import org.hswebframework.web.crud.annotation.EnableEasyormRepository;
+import org.jetlinks.pro.demo.configuration.DemoAuthenticationDimensionSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Import;
 
 /**
  * 应用示例的独立响应式启动入口，只装配示例业务及平台公共运行时。
@@ -15,6 +17,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 @EnableAopAuthorize
 @EnableEasyormRepository("org.jetlinks.pro.**.entity")
+@Import(DemoAuthenticationDimensionSource.class)
 public class DemoApplication {
 
     public static void main(String[] args) {

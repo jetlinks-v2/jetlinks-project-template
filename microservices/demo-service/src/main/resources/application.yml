@@ -72,6 +72,20 @@ hsweb:
         redis:
             local-cache-type: guava
 jetlinks:
+    auto-init:
+        enabled: true
+        strategy:
+            DynamicDimensionTypeEntity.entity.json: increment
+    assets:
+        asset-tables:
+            demo_inspection_team: demo-inspection-team
+        direct:
+            enabled: true
+            tables:
+                demo_record:
+                    asset-type: demo-record
+                    dimension-column:
+                        demo-inspection-team: inspectionTeamId
     server-id: ${spring.application.name}:${server.port} #集群节点ID,不同集群节点请设置不同的ID
     cluster:
         id: ${jetlinks.server-id}

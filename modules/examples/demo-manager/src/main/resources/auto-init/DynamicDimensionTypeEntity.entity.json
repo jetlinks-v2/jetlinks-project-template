@@ -1,0 +1,20 @@
+[
+  {
+    "id": "demo-inspection-team",
+    "name": "巡检班组",
+    "description": "演示巡检班组层级、用户班组绑定与巡检计划数据权限",
+    "owner": ["demo"],
+    "state": "enabled",
+    "features": ["tree", "userBinding", "dataAccess", "includeChildren"],
+    "i18nMessages": {
+      "name": {"zh": "巡检班组", "en": "Inspection team"}
+    },
+    "dataAccessConfig": {
+      "name": "所在巡检班组",
+      "assetTypes": ["demo-record", "demo-inspection-team"],
+      "i18nMessages": {
+        "name": {"zh": "所在巡检班组", "en": "Current inspection team"}
+      }
+    }
+  }
+]

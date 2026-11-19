@@ -2,17 +2,19 @@
   {
     "id": "demo-record-menu",
     "code": "demo/Record",
-    "name": "示例记录",
+    "name": "巡检计划",
     "url": "/demo/record",
     "owner": "app",
     "icon": "UnorderedListOutlined",
     "sortIndex": 1,
     "i18nMessages": {
-      "name": { "zh_CN": "示例记录", "en_US": "Example Records", "en": "Example Records" }
+      "name": { "zh_CN": "巡检计划", "en_US": "Inspection Plans", "en": "Inspection Plans" }
     },
     "showPage": ["demo-record"],
     "permissions": [
-      { "permission": "demo-record", "actions": ["query"] }
+      { "permission": "demo-record", "actions": ["query"] },
+      { "permission": "demo-inspection-team", "actions": ["query"] },
+      { "permission": "user", "actions": ["query"] }
     ],
     "buttons": [
       {
@@ -36,6 +38,56 @@
     ],
     "accessSupport": { "text": "支持", "value": "support" },
     "supportDataAccess": true,
-    "assetType": "demo-record"
+    "assetTypes": ["demo-record", "demo-inspection-team"]
+  },
+  {
+    "id": "demo-inspection-team-menu",
+    "code": "demo/InspectionTeam",
+    "name": "巡检班组",
+    "url": "/demo/inspection-team",
+    "owner": "app",
+    "icon": "TeamOutlined",
+    "sortIndex": 2,
+    "i18nMessages": {
+      "name": { "zh_CN": "巡检班组", "en_US": "Inspection Teams", "en": "Inspection Teams" }
+    },
+    "showPage": ["demo-inspection-team"],
+    "permissions": [
+      { "permission": "demo-inspection-team", "actions": ["query"] },
+      { "permission": "user", "actions": ["query"] }
+    ],
+    "buttons": [
+      {
+        "id": "add",
+        "name": "新增班组",
+        "i18nMessages": { "zh_CN": "新增班组", "en_US": "Add Team", "en": "Add Team" },
+        "permissions": [{ "permission": "demo-inspection-team", "actions": ["save"] }]
+      },
+      {
+        "id": "update",
+        "name": "编辑班组",
+        "i18nMessages": { "zh_CN": "编辑班组", "en_US": "Edit Team", "en": "Edit Team" },
+        "permissions": [{ "permission": "demo-inspection-team", "actions": ["save"] }]
+      },
+      {
+        "id": "members",
+        "name": "成员管理",
+        "i18nMessages": { "zh_CN": "成员管理", "en_US": "Manage Members", "en": "Manage Members" },
+        "permissions": [
+          { "permission": "demo-inspection-team", "actions": ["save"] },
+          { "permission": "user", "actions": ["query"] },
+          { "permission": "dimension", "actions": ["save", "delete"] }
+        ]
+      },
+      {
+        "id": "delete",
+        "name": "删除班组",
+        "i18nMessages": { "zh_CN": "删除班组", "en_US": "Delete Team", "en": "Delete Team" },
+        "permissions": [{ "permission": "demo-inspection-team", "actions": ["delete"] }]
+      }
+    ],
+    "accessSupport": { "text": "支持", "value": "support" },
+    "supportDataAccess": true,
+    "assetTypes": ["demo-inspection-team", "user"]
   }
 ]
